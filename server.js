@@ -13,7 +13,7 @@
 // ================================================================
 
 require('dotenv').config();
-
+console.log('DEBUG - PORT từ .env:', process.env.PORT);
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
