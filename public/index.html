@@ -569,6 +569,16 @@ h1 em{
   margin:8px 0 4px 20px; padding:0; color:var(--slate); font-size:12px; line-height:1.7;
 }
 .legal-details li{ margin-bottom:6px; }
+.legal-consent{margin:16px 0 14px;padding:12px 13px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:rgba(12,11,21,.58)}
+.legal-consent-row{display:flex;align-items:flex-start;gap:10px;cursor:pointer;color:#cfc7d6;font-size:12.5px;line-height:1.55}
+.legal-consent-row input{appearance:none;width:17px;height:17px;flex:0 0 17px;margin-top:1px;border-radius:5px;border:1px solid #705d80;background:#161522;position:relative;cursor:pointer}
+.legal-consent-row input:checked{background:linear-gradient(135deg,#ce5ce7,#8357f0);border-color:#ce6df0}
+.legal-consent-row input:checked::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:800}
+.legal-consent-row a{color:#d98af7;text-decoration:none}.legal-consent-row a:hover{color:#fff;text-decoration:underline}
+.legal-consent-details{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+.legal-consent-details.open{display:block}.legal-consent-details h4{color:#f0eaf3;font-size:12.5px;margin:0 0 5px}.legal-consent-details p{color:#938a9d;font-size:11.5px;line-height:1.6;margin:0 0 9px}
+.legal-consent-error{display:none;margin-top:7px;color:#ff7a88;font-size:11.5px}.legal-consent-error.show{display:block}
+
 
 footer{
   text-align:center; padding:34px 24px 50px;
@@ -1435,6 +1445,20 @@ body{
           <div class="auth-field"><label for="registerEmail">Email</label><div class="auth-input-wrap"><span>✉</span><input type="email" id="registerEmail" placeholder="Nhập email của bạn" autocomplete="email"></div></div>
           <div class="auth-field"><label for="registerPassword">Mật khẩu</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="registerPassword" placeholder="Tạo mật khẩu (ít nhất 6 ký tự)" autocomplete="new-password"><button type="button" class="auth-eye" onclick="toggleAuthPasswordV2('registerPassword',this)">◉</button></div></div>
           <div class="auth-field"><label for="registerPasswordConfirm">Xác nhận mật khẩu</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="registerPasswordConfirm" placeholder="Nhập lại mật khẩu" autocomplete="new-password" onkeydown="if(event.key==='Enter') handleRegister()"><button type="button" class="auth-eye" onclick="toggleAuthPasswordV2('registerPasswordConfirm',this)">◉</button></div></div>
+          <div class="legal-consent">
+            <label class="legal-consent-row" for="registerLegalConsent">
+              <input type="checkbox" id="registerLegalConsent">
+              <span>Tôi đồng ý với <a href="javascript:void(0)" onclick="toggleRegisterLegal(event)">Điều khoản dịch vụ</a> và <a href="javascript:void(0)" onclick="toggleRegisterLegal(event)">Chính sách bảo mật</a> của MeoMeoFindMovie.</span>
+            </label>
+            <div class="legal-consent-details" id="registerLegalDetails">
+              <h4>Điều khoản dịch vụ</h4>
+              <p>Bạn sử dụng MeoMeoFindMovie đúng mục đích, không cố gắng phá hoại, truy cập trái phép hoặc lạm dụng các tính năng của website. Tài khoản có thể bị khóa nếu vi phạm quy định.</p>
+              <h4>Chính sách bảo mật</h4>
+              <p>Website sử dụng thông tin đăng ký cần thiết như họ tên và email để tạo, duy trì và bảo vệ tài khoản. Dữ liệu tài khoản có thể được lưu trong hệ thống của website để cung cấp các tính năng đăng nhập, lưu phim, lịch sử và quản trị.</p>
+              <p>Bạn có thể yêu cầu xóa tài khoản theo tính năng được cung cấp trên website. Nội dung này là thông tin sử dụng của website, không thay thế tư vấn pháp lý.</p>
+            </div>
+            <div class="legal-consent-error" id="registerLegalError">Bạn cần đồng ý với Điều khoản dịch vụ và Chính sách bảo mật để tạo tài khoản.</div>
+          </div>
           <button type="button" class="auth-submit auth-gradient" onclick="handleRegister()">Đăng ký</button>
           <p class="auth-bottom">Đã có tài khoản? <button type="button" onclick="switchAuthTab('login')">Đăng nhập</button></p>
           <p class="auth-msg" id="msgRegister"></p>
@@ -2204,6 +2228,21 @@ async function saveUserRecord(email, record){
   }
 }
 
+function toggleRegisterLegal(event){
+  if(event) event.preventDefault();
+  const details = document.getElementById('registerLegalDetails');
+  if(details) details.classList.toggle('open');
+}
+
+function resetRegisterLegalConsent(){
+  const checkbox = document.getElementById('registerLegalConsent');
+  const details = document.getElementById('registerLegalDetails');
+  const error = document.getElementById('registerLegalError');
+  if(checkbox) checkbox.checked = false;
+  if(details) details.classList.remove('open');
+  if(error) error.classList.remove('show');
+}
+
 function setAuthMsg(which, text, type){
   const el = document.getElementById(which === 'login' ? 'msgLogin' : 'msgRegister');
   el.textContent = text || '';
@@ -2231,6 +2270,7 @@ function switchAuthTab(tab){
   // Khi chủ động quay về login/register thì hủy phiên OTP/reset đang chờ.
   pendingRegistration = null;
   pendingPasswordReset = null;
+  if(tab === 'login') resetRegisterLegalConsent();
   setAuthMsg('login', '');
   setAuthMsg('register', '');
 }
@@ -2269,6 +2309,15 @@ async function handleRegister(){
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
   const confirm = document.getElementById('registerPasswordConfirm').value;
+  const legalConsent = document.getElementById('registerLegalConsent');
+  const legalError = document.getElementById('registerLegalError');
+  if(legalError) legalError.classList.remove('show');
+  if(!legalConsent?.checked){
+    if(legalError) legalError.classList.add('show');
+    setAuthMsg('register', 'Vui lòng đồng ý với Điều khoản dịch vụ và Chính sách bảo mật trước khi tạo tài khoản.', 'error');
+    legalConsent?.focus();
+    return;
+  }
   if(!name){
     setAuthMsg('register', 'Vui lòng nhập họ và tên.', 'error');
     return;
@@ -2295,7 +2344,7 @@ async function handleRegister(){
     setAuthMsg('register', 'Email này đã được đăng ký rồi. Hãy chuyển sang tab "Đăng nhập" thay vì đăng ký lại.', 'error');
     return;
   }
-  await sendRegistrationOtp(email, password, name);
+  await sendRegistrationOtp(email, password, name, { termsVersion: '2026-08-17', privacyVersion: '2026-08-17', consentAt: Date.now() });
 }
 
 /* ================= XÁC MINH EMAIL BẰNG MÃ OTP (Backend Node.js tự host) =================
@@ -2360,7 +2409,7 @@ function otpErrorMessage(error, waitSec){
   return OTP_ERROR_MESSAGES[error] || 'Xác minh thất bại. Thử lại nhé.';
 }
 
-async function sendRegistrationOtp(email, password, name){
+async function sendRegistrationOtp(email, password, name, legalConsent){
   try{
     const { expiresAt } = await requestOtp(email, 'register');
     pendingRegistration = { email, password, name: name || pendingRegistration?.name || '', expiresAt };
@@ -2441,6 +2490,7 @@ async function verifyOtpAndFinishRegister(){
     password: await hashPassword(password, email),
     registeredAt: Date.now(),
     banned: false,
+    legalConsent: pendingRegistration.legalConsent || null,
   });
   pendingRegistration = null;
   setAuthMsg('register', 'Xác minh thành công, đăng ký hoàn tất!', 'success');
@@ -2605,6 +2655,7 @@ function logout(){
   document.getElementById('registerEmail').value = '';
   document.getElementById('registerPassword').value = '';
   document.getElementById('registerPasswordConfirm').value = '';
+  resetRegisterLegalConsent();
   switchAuthTab('login');
   document.getElementById('quiz').classList.remove('active');
   document.getElementById('quiz').setAttribute('aria-hidden','true');
