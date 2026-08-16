@@ -122,9 +122,39 @@ h1 em{
   margin-top:-5px;
 }
 
+#results{display:none !important;}
+
+
+/* ===== PERSONALIZED RECOMMENDATION SURVEY ===== */
+#quiz{
+  position:fixed; inset:0; z-index:1000; padding:24px; display:none;
+  align-items:center; justify-content:center;
+}
+#quiz.active{display:flex;}
+#quiz .quiz-backdrop{position:absolute; inset:0; background:rgba(2,2,8,.78); backdrop-filter:blur(12px);}
+#quiz .quiz-modal{position:relative; z-index:1; width:min(960px,100%); max-height:min(88vh,760px); overflow:auto;
+  background:
+    linear-gradient(180deg,rgba(13,13,24,.97),rgba(8,8,14,.99)),
+    radial-gradient(circle at 18% 0%,rgba(242,154,216,.12),transparent 34%),
+    radial-gradient(circle at 85% 8%,rgba(117,198,255,.12),transparent 32%);
+  border:1px solid rgba(255,255,255,.13); border-radius:22px; padding:30px 30px 26px;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);}
+#quiz .quiz-close{position:absolute; top:16px; right:18px; width:38px; height:38px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--paper);
+  cursor:pointer; font-size:16px;}
+#quiz .quiz-close:hover{border-color:var(--gold-dim);}
+#quiz .progress-track{margin-top:4px; margin-bottom:28px;}
+#quiz .step{max-width:100%;}
+#quiz .step h2{margin-top:0;}
+@media(max-width:640px){
+  #quiz{padding:12px;}
+  #quiz .quiz-modal{padding:28px 18px 20px; border-radius:20px; max-height:92vh;}
+  #quiz .options{grid-template-columns:1fr; gap:10px;}
+  #quiz .opt{padding:13px 13px; min-height:66px;}
+  #quiz .step-nav{position:sticky; bottom:0; padding-top:10px; background:linear-gradient(180deg,transparent,var(--film-black) 35%);}
+}
+
 /* ---------- QUIZ ---------- */
-#quiz{ padding:60px 24px 100px; display:none; }
-#quiz.active{display:block;}
 
 .progress-track{
   display:flex; gap:6px; justify-content:center; margin-bottom:44px;
@@ -154,35 +184,49 @@ h1 em{
   font-size:clamp(24px, 4vw, 32px);
   margin-bottom:8px;
 }
-.step .hint{color:var(--slate); font-size:14px; margin-bottom:32px;}
+.step .hint{color:var(--slate); font-size:14px; margin-bottom:28px;}
 
 .options{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
-  gap:12px;
-  margin-bottom:36px;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:14px;
+  margin-bottom:34px;
 }
 .opt{
-  background:var(--ink-soft);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:18px 16px;
+  background:rgba(16,16,26,.84);
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:9px;
+  padding:15px 16px;
   cursor:pointer;
   text-align:left;
-  transition:border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  transition:border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   color:var(--paper);
   font-family:'Work Sans', sans-serif;
+  min-height:74px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045), 0 10px 26px rgba(0,0,0,.22);
 }
-.opt:hover{border-color:var(--gold-dim); transform:translateY(-1px);}
+.opt:hover{border-color:rgba(242,154,216,.42); transform:translateY(-1px);}
 .opt:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
 .opt.selected{
-  background:rgba(232,174,73,0.12);
-  border-color:var(--gold);
+  background:rgba(242,154,216,.12);
+  border-color:rgba(242,154,216,.7);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(242,154,216,.22), 0 14px 34px rgba(0,0,0,.3);
 }
-.opt .oi{font-size:22px; display:block; margin-bottom:8px;}
-.opt .ot{font-weight:600; font-size:14.5px; display:block;}
-.opt .od{font-size:12.5px; color:var(--slate); margin-top:4px; display:block;}
+.opt .oi{font-size:28px; width:34px; flex:0 0 34px; display:grid; place-items:center; margin:0;}
+.opt .ot{font-weight:700; font-size:14.5px; display:block; line-height:1.2;}
+.opt .od{font-size:11.5px; color:#b9b0c1; margin-top:4px; display:block; line-height:1.25;}
 .opt.selected .od{color:rgba(243,238,227,0.65);}
+.options .opt:nth-child(1) .ot{color:#ffd35d;}
+.options .opt:nth-child(2) .ot{color:#8ee8c4;}
+.options .opt:nth-child(3) .ot{color:#75c6ff;}
+.options .opt:nth-child(4) .ot{color:#ff8992;}
+.options .opt:nth-child(5) .ot{color:#ff9fbd;}
+.options .opt:nth-child(6) .ot{color:#d3a4ff;}
+.options .opt:nth-child(7) .ot{color:#e6edf7;}
+.options .opt:nth-child(8) .ot{color:#ffc95f;}
 
 .step-nav{
   display:flex; justify-content:space-between; align-items:center; gap:12px;
@@ -496,60 +540,20 @@ h1 em{
 .tmdb-result-item:hover{ border-color:var(--gold-dim); }
 .tmdb-result-item img{ width:36px; border-radius:4px; flex-shrink:0; }
 
-/* ---------- AUTH (đăng nhập / đăng ký) ---------- */
-.auth-section{ padding:40px 24px 10px; }
-.auth-card{
-  max-width:420px; margin:0 auto;
-  background:var(--ink-soft);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:28px 26px;
-}
-.auth-tabs{ display:flex; gap:8px; margin-bottom:22px; }
-.auth-tab{
-  flex:1; background:transparent;
-  border:1px solid var(--line);
-  color:var(--slate);
-  font-family:'Work Sans', sans-serif;
-  font-weight:600; font-size:13px;
-  padding:10px; border-radius:999px;
-  cursor:pointer; transition:all 0.15s ease;
-}
-.auth-tab:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
-.auth-tab.active{ background:var(--gold); color:var(--film-black); border-color:var(--gold); }
-.auth-form{ display:none; }
-.auth-form.active{ display:block; animation:rise 0.3s ease both; }
-.auth-field{ margin-bottom:14px; text-align:left; }
-.auth-field label{ display:block; font-size:12px; color:var(--slate); margin-bottom:6px; }
-.auth-field input{
-  width:100%; background:var(--film-black);
-  border:1px solid var(--line); border-radius:10px;
-  padding:12px 14px; color:var(--paper);
-  font-family:'Work Sans', sans-serif; font-size:14px;
-}
-.auth-field input:focus-visible{ outline:2px solid var(--gold); outline-offset:1px; }
-.auth-submit{
-  width:100%; background:var(--gold); color:var(--film-black);
-  border:none; font-weight:700; padding:13px;
-  border-radius:999px; cursor:pointer; font-size:14px; margin-top:4px;
-  font-family:'Work Sans', sans-serif;
-}
-.auth-msg{ font-size:12.5px; margin-top:10px; min-height:16px; color:var(--slate); }
-.auth-msg.error{ color:var(--ember); }
-.auth-msg.success{ color:var(--gold); }
-.auth-loggedin{ display:none; text-align:center; }
-.auth-loggedin.active{ display:block; animation:rise 0.3s ease both; }
-.auth-avatar{
-  width:46px; height:46px; border-radius:50%;
-  background:rgba(232,174,73,0.15); color:var(--gold);
-  display:flex; align-items:center; justify-content:center;
-  font-family:'Fraunces', serif; font-weight:700; font-size:18px;
-  margin:0 auto 12px;
-}
-.auth-email{ font-size:14px; font-weight:600; margin-bottom:4px; word-break:break-all; }
-.auth-sub{ font-size:12px; color:var(--slate); margin-bottom:18px; }
-.auth-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-
+/* ---------- AUTH MODAL (chỉ mở khi người dùng cần đăng nhập) ---------- */
+.auth-section{display:none;position:fixed;inset:0;z-index:9000;padding:0;align-items:center;justify-content:center;overflow:hidden}
+.auth-section.home-auth-modal{display:flex!important}
+.auth-backdrop{position:fixed;inset:0;background:#030710;background:rgba(2,3,10,.98);backdrop-filter:blur(6px);z-index:999;pointer-events:all}
+.auth-modal-shell{position:fixed;inset:0;z-index:1001;width:100%;height:100%;display:grid;grid-template-columns:1.02fr .98fr;border:none;border-radius:0;overflow:hidden;background:#070813;box-shadow:none}
+.auth-showcase{position:relative;padding:30px 34px;background:radial-gradient(circle at 25% 45%,rgba(128,75,255,.16),transparent 30%),linear-gradient(145deg,rgba(14,14,27,.97),rgba(4,6,16,.99));overflow:hidden}
+.auth-showcase:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,5,12,.12),rgba(4,5,12,.5)),radial-gradient(circle at 72% 30%,rgba(242,154,216,.08),transparent 35%);pointer-events:none}
+.auth-brand{position:relative;z-index:2;display:flex;align-items:center;gap:11px}.auth-brand-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:13px;background:rgba(120,70,220,.18);border:1px solid rgba(180,105,255,.32);font-size:25px}.auth-brand b{display:block;color:#fff;font:800 22px/1 'Fraunces',serif;letter-spacing:.08em}.auth-brand small{display:block;color:#b9afc3;font-size:9px;letter-spacing:.36em;margin-top:5px}
+.auth-showcase-copy{position:relative;z-index:2;margin-top:92px}.auth-kicker{color:#bcb4c7;font-size:14.5px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}.auth-showcase-copy h2{margin:0 0 16px;color:#fff;font:700 clamp(40px,4.3vw,58px)/1.12 'Work Sans',sans-serif;letter-spacing:-.035em}.auth-showcase-copy h2 span{background:linear-gradient(90deg,#f29ad8,#9765ff);-webkit-background-clip:text;background-clip:text;color:transparent}.auth-showcase-copy p{max-width:500px;color:#c2bacb;font-size:18px;line-height:1.7;margin:0 0 32px}.auth-art{background-repeat:no-repeat;background-size:contain;background-position:center;filter:drop-shadow(0 16px 28px rgba(90,40,155,.38))}.auth-benefits{display:grid;gap:15px;max-width:470px}.auth-benefits>div{display:flex;align-items:center;gap:12px}.auth-benefits i{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(169,87,255,.35);background:rgba(91,44,139,.2);color:#d68cff;font-style:normal;font-size:21px}.auth-benefits b{display:block;color:#f0eaf3;font-size:16px;margin-bottom:4px}.auth-benefits small{display:block;color:#958c9f;font-size:13.5px}.auth-showcase-foot{position:absolute;left:34px;bottom:25px;z-index:2;color:#8e8796;font-size:11px}.auth-showcase-foot b{color:#25d4c0;font-size:14px;margin-left:4px}
+.auth-modal-card{position:relative;display:flex;align-items:center;justify-content:center;padding:42px 42px;background:linear-gradient(180deg,rgba(13,13,25,.98),rgba(7,8,18,.99));overflow:auto}.auth-modal-close{position:absolute;right:18px;top:14px;z-index:5;width:36px;height:36px;border:1px solid rgba(255,255,255,.12);border-radius:50%;background:rgba(17,16,28,.78);color:#c9c1d0;font-size:17px;cursor:pointer}.auth-modal-close:hover{color:#fff;border-color:rgba(242,154,216,.45)}#authForms{width:100%;max-width:500px}.auth-form{display:none}.auth-form.active{display:block;animation:authRise .28s ease both}@keyframes authRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.auth-title-row h2{margin:0 0 10px;color:#f7f3f9;font:700 clamp(34px,3.7vw,45px)/1.15 'Work Sans',sans-serif;letter-spacing:-.03em}.auth-title-row p{margin:0 0 28px;color:#aaa1b2;font-size:16px;line-height:1.6}.auth-back-link{border:0;background:transparent;color:#aaa1b2;font:500 11px 'Work Sans',sans-serif;padding:0;margin:0 0 22px;cursor:pointer}.auth-back-link:hover{color:#fff}.auth-back-hidden{visibility:hidden}
+.auth-field{margin-bottom:14px;text-align:left}.auth-field label{display:block;color:#eee9f1;font-size:14px;font-weight:600;margin-bottom:8px}.auth-input-wrap{height:46px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(16,16,28,.86);transition:.18s}.auth-input-wrap:focus-within{border-color:rgba(205,112,255,.75);box-shadow:0 0 0 3px rgba(169,76,255,.08)}.auth-input-wrap>span{width:16px;color:#7e7788;font-size:16px;text-align:center}.auth-input-wrap input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#f7f3f9;font:400 14.5px 'Work Sans',sans-serif}.auth-input-wrap input::placeholder{color:#756e7d}.auth-eye{border:0;background:transparent;color:#7d7585;cursor:pointer;padding:2px}.auth-eye:hover{color:#fff}
+.auth-options{display:flex;justify-content:space-between;align-items:center;margin:5px 0 20px}.auth-options label{display:flex;align-items:center;gap:7px;color:#d2cad7;font-size:13px}.auth-options input{appearance:none;width:15px;height:15px;border-radius:4px;border:1px solid #705d80;background:#161522;position:relative}.auth-options input:checked{background:linear-gradient(135deg,#ce5ce7,#8357f0);border-color:#ce6df0}.auth-options input:checked:after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:800}.auth-options button,.auth-bottom button,.auth-reset-actions button{border:0;background:transparent;color:#cf78f4;cursor:pointer;font:500 13px 'Work Sans',sans-serif;padding:0}.auth-options button:hover,.auth-bottom button:hover,.auth-reset-actions button:hover{color:#fff}
+.auth-submit{width:100%;height:48px;border:0;border-radius:8px;cursor:pointer;color:#fff;font:700 15px 'Work Sans',sans-serif;transition:.18s}.auth-gradient{background:linear-gradient(90deg,#d35bcf,#b55bea 50%,#7950ef);box-shadow:0 10px 26px rgba(139,67,222,.24)}.auth-gradient:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(139,67,222,.32)}.auth-submit b{font-size:18px;margin-left:7px}.auth-divider{display:flex;align-items:center;gap:12px;color:#777080;font-size:10px;margin:19px 0 11px}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:rgba(255,255,255,.1);flex:1}.auth-social{width:100%;height:44px;margin-bottom:8px;border:1px solid rgba(255,255,255,.13);border-radius:8px;background:rgba(10,10,18,.76);color:#e9e4eb;cursor:pointer;font:600 13.5px 'Work Sans',sans-serif}.auth-social:hover{border-color:rgba(242,154,216,.4)}.google-mark{font:800 18px Arial;margin-right:7px;background:linear-gradient(90deg,#4285f4,#34a853,#fbbc05,#ea4335);-webkit-background-clip:text;background-clip:text;color:transparent}.apple-mark{color:#fff;margin-right:7px}.auth-bottom{text-align:center;color:#9991a2;font-size:13px;margin:20px 0 0}.auth-msg{font-size:12.5px;min-height:15px;margin-top:8px;color:#aaa2b0}.auth-msg.error{color:#ff7a88}.auth-msg.success{color:#8ce6c4}.auth-note{margin:13px 0;width:500px;min-height:50px;font-weight:bold;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px;background:rgba(14,13,23,.6)}.auth-note b{display:block;color:#ffcc58;font-size:14px;margin-bottom:5px}.auth-note span{color:#938a9d;font-size:13px;line-height:1.5}.auth-screen-art{height:120px;margin:-4px auto 4px;max-width:230px}.auth-screen-art .auth-art{width:100%;height:100%}.auth-reset-actions{display:flex;justify-content:space-between;margin-top:11px}.auth-loggedin{display:none;text-align:center}.auth-loggedin.active{display:block;animation:authRise .28s ease both}.auth-avatar{width:46px;height:46px;border-radius:50%;background:rgba(168,89,255,.15);color:#cf7cff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:18px;margin:0 auto 12px}.auth-email{font-size:14px;font-weight:600;margin-bottom:4px;word-break:break-all}.auth-sub{font-size:12px;color:var(--slate);margin-bottom:18px}.auth-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .legal-box{ margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
 .legal-details{ margin-bottom:8px; }
 .legal-details summary{
@@ -653,11 +657,601 @@ footer{
 @media (prefers-reduced-motion: reduce){
   *{animation:none !important; transition:none !important;}
 }
+
+/* =========================================================
+   MEOMEOW FIND MOVIE — HOMEPAGE UI REFRESH
+   Giữ nguyên toàn bộ logic cũ, chỉ thay lớp giao diện.
+   ========================================================= */
+:root{
+  --pink:#f29ad8;
+  --pink-2:#c97cf1;
+  --purple:#8b63ff;
+  --purple-deep:#5b42bd;
+  --glass:rgba(13,12,28,.68);
+  --glass-2:rgba(24,21,43,.82);
+  --white:#f7f4fb;
+  --muted:#aaa5b8;
+}
+body{
+  background:#05050b;
+  color:var(--white);
+  font-family:'Work Sans',sans-serif;
+}
+.marquee,.sprocket-row{display:none!important;}
+
+.home-app{
+  min-height:100vh;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 15%,rgba(139,99,255,.14),transparent 35%),
+    radial-gradient(circle at 80% 45%,rgba(242,154,216,.08),transparent 28%),
+    #05050b;
+}
+.home-backdrop{
+  position:absolute; inset:72px 0 auto; height:650px;
+  pointer-events:none; overflow:hidden; opacity:.34;
+  background-size:cover; background-position:center;
+}
+.home-backdrop::after{
+  content:""; position:absolute; inset:0;
+  background:
+    linear-gradient(180deg,rgba(5,5,11,.18),#05050b 88%),
+    linear-gradient(90deg,rgba(5,5,11,.78),transparent 35%,transparent 65%,rgba(5,5,11,.82));
+}
+.home-header{
+  height:76px; position:relative; z-index:20;
+  display:flex; align-items:center; gap:30px;
+  padding:0 clamp(22px,5vw,72px);
+  border-bottom:1px solid rgba(255,255,255,.10);
+  background:rgba(3,3,8,.72);
+  backdrop-filter:blur(18px);
+}
+.home-brand{
+  display:flex; align-items:center; gap:10px;
+  min-width:235px; text-decoration:none; color:var(--white);
+}
+.brand-cat{
+  width:47px;height:47px;display:grid;place-items:center;
+  border:1px solid rgba(242,154,216,.35);
+  border-radius:15px;
+  background:linear-gradient(135deg,rgba(242,154,216,.22),rgba(139,99,255,.14));
+  font-size:25px;
+}
+.brand-copy{line-height:1}
+.brand-name{
+  font-family:'Fraunces',serif;font-size:22px;font-weight:800;
+  letter-spacing:.05em;
+}
+.brand-sub{
+  display:block;margin-top:5px;font-size:9px;letter-spacing:.38em;
+  color:#c7bfd1;
+}
+.home-nav{
+  display:flex;align-items:center;gap:34px;height:100%;
+}
+.home-nav a,.home-nav button{
+  height:100%; display:flex;align-items:center;gap:7px;
+  color:#ded9e6;text-decoration:none;border:0;background:transparent;
+  font:500 14px 'Work Sans',sans-serif;cursor:pointer;position:relative;
+}
+.home-nav a.active{color:#fff;}
+.home-nav a.active::after{
+  content:"";position:absolute;left:0;right:0;bottom:4px;height:2px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  border-radius:99px;
+}
+.home-header-actions{
+  margin-left:auto;display:flex;align-items:center;gap:24px;
+}
+.home-icon-btn{
+  border:0;background:transparent;color:#f5f2f8;font-size:23px;
+  cursor:pointer;width:36px;height:36px;display:grid;place-items:center;
+}
+.home-profile-wrap{position:relative;}
+.home-profile{
+  display:flex;align-items:center;gap:9px;border:0;background:transparent;
+  color:#f4f0f7;cursor:pointer;font:500 14px 'Work Sans',sans-serif;
+}
+.home-avatar{
+  width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+  font-size:22px;background:linear-gradient(135deg,#f3b6e9,#8b63ff);
+  border:1px solid rgba(255,255,255,.28);
+}
+.home-chevron{font-size:13px;opacity:.8}
+.profile-menu{
+  display:none;position:absolute;right:0;top:52px;width:190px;
+  padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:14px;
+  background:rgba(18,16,31,.96);box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+.profile-menu.open{display:block;}
+.profile-menu button{
+  width:100%;padding:10px 12px;border:0;border-radius:9px;
+  text-align:left;background:transparent;color:#eee7f2;cursor:pointer;
+  font:500 13px 'Work Sans',sans-serif;
+}
+.profile-menu button:hover{background:rgba(255,255,255,.07);}
+
+.home-content{
+  position:relative;z-index:3;max-width:1160px;margin:0 auto;
+  padding:48px 24px 80px;
+}
+.home-hero{text-align:center;max-width:900px;margin:0 auto;}
+.home-cat{
+  width:74px;height:74px;margin:0 auto 12px;display:grid;place-items:center;
+  font-size:46px;filter:drop-shadow(0 0 18px rgba(242,154,216,.45));
+}
+.home-kicker{
+  color:#bdb4c9;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.home-title{
+  font-family:'Work Sans',sans-serif;font-weight:700;
+  font-size:clamp(42px,5vw,62px);line-height:1.03;letter-spacing:-.035em;
+  margin:0 auto 12px;
+}
+.home-title .gradient{
+  background:linear-gradient(90deg,#fff 5%,#e6a6ff 55%,#b06cff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.home-subtitle{font-size:15px;color:#c6bfce;margin-bottom:17px;}
+.home-moods{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;max-width:820px;margin:0 auto 16px;
+}
+.home-mood{
+  min-height:78px;padding:13px 16px;text-align:left;
+  border:1px solid rgba(255,255,255,.16);border-radius:12px;
+  background:linear-gradient(135deg,rgba(31,28,48,.72),rgba(14,13,25,.76));
+  color:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;
+  transition:.18s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+.home-mood:hover{transform:translateY(-2px);border-color:rgba(242,154,216,.55);}
+.home-mood.selected{
+  border-color:#d78af3;
+  box-shadow:0 0 0 1px rgba(242,154,216,.25),0 12px 30px rgba(139,99,255,.16);
+  background:linear-gradient(135deg,rgba(68,44,87,.75),rgba(27,21,48,.82));
+}
+.home-mood-icon{font-size:28px;width:36px;text-align:center;}
+.home-mood-copy{min-width:0;}
+.home-mood-name{font-weight:700;font-size:15px;margin-bottom:4px;}
+.home-mood-desc{font-size:10.5px;color:#b9b0c1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-mood:nth-child(1) .home-mood-name{color:#ffd35d}
+.home-mood:nth-child(2) .home-mood-name{color:#8ee8c4}
+.home-mood:nth-child(3) .home-mood-name{color:#75c6ff}
+.home-mood:nth-child(4) .home-mood-name{color:#ff8992}
+.home-mood:nth-child(5) .home-mood-name{color:#ff9fbd}
+.home-mood:nth-child(6) .home-mood-name{color:#d3a4ff}
+.home-mood:nth-child(7) .home-mood-name{color:#e6edf7}
+.home-mood:nth-child(8) .home-mood-name{color:#ffc95f}
+.home-recommend{
+  border:0;border-radius:999px;padding:15px 34px;
+  color:#fff;font:700 16px 'Work Sans',sans-serif;cursor:pointer;
+  background:linear-gradient(90deg,#ff8a83,#d980f3 52%,#8057e9);
+  box-shadow:0 12px 32px rgba(153,93,230,.32);
+  transition:.18s ease;
+}
+.home-recommend:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(153,93,230,.42);}
+.home-recommend:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.home-arrow{
+  display:inline-block;margin-left:15px;color:#8c73d8;font-size:32px;
+  transform:rotate(-15deg);
+}
+
+.home-section{margin-top:52px;}
+.home-section-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;
+}
+.home-section-title{font-size:18px;font-weight:700;}
+.home-section-title span{margin-right:8px;}
+.home-card-actions{position:absolute;z-index:4;right:7px;top:7px;display:flex;gap:5px}
+.home-badge{position:absolute;z-index:4;left:7px;top:7px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:600;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);background:rgba(20,14,29,.78);color:#ffd34f;display:none;align-items:center;gap:3px}
+.home-badge.show{display:inline-flex}
+.home-badge.fav{color:#ff7181;border-color:rgba(255,85,108,.35)}
+.home-save-mini,.saved-action-btn{width:32px;height:32px;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:rgba(8,8,14,.72);backdrop-filter:blur(8px);color:#e5e0e9;cursor:pointer;display:grid;place-items:center;padding:0;transition:.18s ease;box-shadow:0 5px 16px rgba(0,0,0,.25)}
+.home-save-mini:hover,.saved-action-btn:hover{transform:scale(1.07);background:rgba(18,15,27,.9)}
+.home-save-mini svg,.saved-action-btn svg{width:17px;height:17px;display:block}
+.home-save-mini.on,.saved-action-btn.on{color:#ffd34f;border-color:rgba(255,211,79,.55);background:rgba(70,53,8,.76);box-shadow:0 0 15px rgba(255,211,79,.16)}
+.home-save-mini.fav,.saved-action-btn.fav{color:#ff6678;border-color:rgba(255,102,120,.55);background:rgba(72,13,25,.76);box-shadow:0 0 15px rgba(255,72,96,.14)}
+.home-save-mini.on svg .icon-fill,.saved-action-btn.on svg .icon-fill{fill:currentColor}
+.home-save-mini.fav svg .icon-fill,.saved-action-btn.fav svg .icon-fill{fill:currentColor}
+
+.home-see-all{color:#cfc7d6;font-size:13px;background:transparent;border:0;cursor:pointer;}
+.home-see-all:hover{color:#fff;}
+.home-movie-row{
+  display:grid;grid-auto-flow:column;grid-auto-columns:140px;
+  grid-template-rows:1fr;gap:14px;overflow-x:auto;padding:2px 2px 12px;
+  scrollbar-width:none;
+}
+.home-movie-row::-webkit-scrollbar{display:none;}
+.home-movie-card{
+  min-width:0;border-radius:9px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  background:#10101a;cursor:pointer;position:relative;
+  transition:.18s ease;
+}
+.home-movie-card:hover{transform:translateY(-4px);border-color:rgba(242,154,216,.38)}
+.home-poster{
+  width:100%;aspect-ratio:2/3;object-fit:cover;display:block;
+  background:linear-gradient(145deg,#262033,#0d0c14);
+}
+.home-poster-fallback{
+  display:flex;align-items:flex-end;padding:12px;
+  font-family:'Fraunces',serif;font-size:20px;line-height:1.05;
+  color:#fff;background:
+    radial-gradient(circle at 70% 20%,rgba(242,154,216,.32),transparent 30%),
+    linear-gradient(145deg,#2b2140,#0b0b12);
+}
+.home-movie-info{padding:8px 9px 10px;}
+.home-movie-title{
+  font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.home-movie-meta{font-size:10.5px;color:#aaa2b1;margin-top:4px;}
+.home-movie-rating{color:#ffd75f;margin-top:5px;font-size:11px;}
+.home-movie-card:focus-visible{outline:2px solid #f29ad8;outline-offset:3px;}
+.home-detail-overlay{
+  position:fixed;inset:0;z-index:9500;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(3,3,8,.78);backdrop-filter:blur(12px);
+}
+.home-detail-overlay.open{display:flex;}
+.home-detail-dialog{
+  width:min(820px,100%);max-height:min(88vh,760px);overflow:auto;
+  border:1px solid rgba(255,255,255,.14);border-radius:18px;
+  background:linear-gradient(180deg,#181525,#0d0c14);
+  box-shadow:0 30px 90px rgba(0,0,0,.62);position:relative;
+}
+.home-detail-close{
+  position:absolute;right:14px;top:12px;z-index:2;width:38px;height:38px;
+  border-radius:50%;border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.05);color:#fff;font-size:22px;cursor:pointer;
+}
+.home-detail-close:hover{border-color:#f29ad8;}
+.home-detail-grid{
+  display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:24px;padding:28px;
+}
+.home-detail-poster{
+  width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:12px;display:block;
+  background:linear-gradient(145deg,#262033,#0d0c14);
+}
+.home-detail-poster-fallback{
+  display:flex;align-items:flex-end;padding:18px;color:#fff;
+  font:700 24px/1.08 'Fraunces',serif;
+  background:
+    radial-gradient(circle at 70% 20%,rgba(242,154,216,.32),transparent 30%),
+    linear-gradient(145deg,#2b2140,#0b0b12);
+}
+.home-detail-kicker{
+  color:#f29ad8;font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.18em;margin:4px 0 9px;
+}
+.home-detail-title{
+  font-family:'Fraunces',serif;font-size:clamp(26px,4vw,38px);
+  line-height:1.08;margin:0 44px 14px 0;color:#fff;
+}
+.home-detail-copy{color:#d8d1df;font-size:14px;line-height:1.7;margin:16px 0 18px;}
+.home-detail-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 14px;}
+.home-detail-fact{
+  border:1px solid rgba(255,255,255,.11);border-radius:10px;
+  background:rgba(255,255,255,.04);padding:10px 12px;min-width:0;
+}
+.home-detail-fact span{
+  display:block;color:#aaa2b1;font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:5px;
+}
+.home-detail-fact b{display:block;color:#fff;font-size:13px;line-height:1.35;font-weight:700;}
+.home-detail-section{
+  border-top:1px dashed rgba(255,255,255,.14);padding-top:15px;
+}
+.home-detail-section h3{font-size:14px;color:#ffd75f;margin:0 0 8px;}
+.home-detail-section p{color:#d8d1df;font-size:14px;line-height:1.7;margin:0;}
+.home-scroll-btn{
+  position:absolute;width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.14);background:rgba(22,20,34,.85);
+  color:#fff;font-size:25px;cursor:pointer;display:grid;place-items:center;
+}
+.home-row-wrap{position:relative;}
+.home-scroll-btn.next{right:-12px;top:42%;}
+.home-scroll-btn.prev{left:-12px;top:42%;}
+
+.home-pagination{
+  display:none; align-items:center; justify-content:space-between;
+  gap:16px; margin-top:16px; flex-wrap:wrap;
+}
+.home-pagination-pages{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.home-page-ellipsis{color:var(--slate); font-size:13px; padding:0 2px;}
+.home-pagination-nav{display:flex; gap:10px; margin-left:auto;}
+.home-page-btn{
+  background:transparent; border:1px solid var(--line); color:var(--paper);
+  font-family:'Work Sans', sans-serif; font-weight:600; font-size:13px;
+  padding:10px 18px; border-radius:999px; cursor:pointer;
+  transition:border-color .15s ease, background .15s ease; white-space:nowrap;
+}
+.home-page-btn:hover{border-color:var(--gold-dim);}
+.home-page-btn:disabled{opacity:.35; cursor:not-allowed;}
+.home-page-btn.primary{background:var(--gold); border-color:var(--gold); color:var(--film-black);}
+.home-page-btn.primary:disabled{background:var(--ink-softer); border-color:var(--line); color:var(--slate);}
+@media(max-width:620px){
+  .home-pagination{flex-direction:column; align-items:stretch;}
+  .home-pagination-nav{margin-left:0; justify-content:flex-end;}
+}
+
+.home-fade-bottom{
+  position:absolute;left:0;right:0;bottom:0;height:180px;
+  background:linear-gradient(transparent,#05050b);pointer-events:none;
+}
+
+
+@media(max-width:900px){
+  .home-header{padding:0 22px;}
+  .home-brand{min-width:auto;}
+  .brand-copy{display:none;}
+  .home-nav{gap:18px;}
+  .home-nav a:nth-child(3),.home-nav a:nth-child(4){display:none;}
+  .home-moods{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .home-content{padding-top:36px;}
+}
+@media(max-width:620px){
+  .home-header{height:64px;padding:0 14px;gap:10px;}
+  .brand-cat{width:39px;height:39px;font-size:20px;border-radius:12px;}
+  .home-nav{display:none;}
+  .home-header-actions{gap:8px;}
+  .home-profile span:not(.home-avatar):not(.home-chevron){display:none;}
+  .home-content{padding:34px 14px 60px;}
+  .home-title{font-size:40px;}
+  .home-subtitle{font-size:13px;}
+  .home-moods{gap:9px;}
+  .home-mood{min-height:72px;padding:10px;}
+  .home-mood-icon{font-size:23px;width:29px;}
+  .home-mood-name{font-size:13px;}
+  .home-mood-desc{font-size:9px;}
+  .home-movie-row{grid-auto-columns:132px;}
+  .home-scroll-btn{display:none;}
+  .home-section{margin-top:40px;}
+  .home-detail-overlay{padding:12px;}
+  .home-detail-grid{grid-template-columns:1fr;padding:20px;gap:16px;}
+  .home-detail-poster{max-width:190px;margin:0 auto;}
+  .home-detail-title{margin-right:42px;}
+  .home-detail-facts{grid-template-columns:1fr;}
+}
+
+
+/* ================= SAVED / HISTORY PAGE ================= */
+.saved-page{display:none;position:relative;z-index:4;min-height:calc(100vh - 76px);padding:44px 28px 72px;background:radial-gradient(circle at 80% 10%,rgba(139,99,255,.10),transparent 28%),radial-gradient(circle at 78% 32%,rgba(242,154,216,.06),transparent 25%)}
+.home-content.saved-home-hidden{display:none}.saved-page.open{display:block}.saved-shell{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:40px}.saved-sidebar{display:flex;flex-direction:column;gap:18px}.saved-side-group,.saved-stat-card,.saved-note{border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(18,18,29,.88),rgba(8,8,15,.82));border-radius:17px;box-shadow:0 20px 60px rgba(0,0,0,.18)}.saved-side-group{padding:10px}.saved-side-group button{width:100%;display:flex;align-items:center;gap:15px;padding:15px 18px;border:0;border-radius:999px;background:transparent;color:#c9c4d1;font:500 14px 'Work Sans',sans-serif;text-align:left;cursor:pointer;transition:.18s}.saved-side-group button span{width:23px;text-align:center;font-size:22px;color:#9e97ac}.saved-side-group button:hover{color:#fff;background:rgba(255,255,255,.04)}.saved-side-group button.active{color:#f6b3eb;background:linear-gradient(90deg,rgba(123,58,176,.30),rgba(48,29,74,.18));box-shadow:inset 0 0 0 1px rgba(190,99,255,.32)}.saved-side-group button.active span{color:#bf76ff}.saved-stat-card{padding:20px 18px}.saved-stat-title{font-size:14px;color:#c8c1ce;margin-bottom:16px}.saved-stat-row{display:flex;align-items:center;gap:13px;padding:10px 0}.saved-stat-row>b{width:46px;height:46px;display:grid;place-items:center;border:1px solid rgba(150,93,255,.28);border-radius:12px;color:#b982ff;font-size:20px}.saved-stat-row.pink>b{color:#ff7086;border-color:rgba(255,83,119,.24)}.saved-stat-row.purple>b{color:#b78cff}.saved-stat-row.orange>b{color:#ff9b6e;border-color:rgba(255,137,92,.22)}.saved-stat-row span{display:flex;flex-direction:column;gap:4px}.saved-stat-row strong{font-size:15px;color:#e9e4ed;font-weight:600}.saved-stat-row small{font-size:12px;color:#8f8998}.saved-note{padding:17px;display:flex;gap:11px;align-items:flex-start}.saved-note span{font-size:22px}.saved-note p{margin:1px 0 0;color:#a9a2b1;font-size:11px;line-height:1.6}.saved-main{min-width:0}.saved-heading{display:flex;align-items:center;gap:20px;margin:5px 0 34px}.saved-heading-icon{width:58px;height:58px;flex:none;border-radius:50%;display:grid;place-items:center;border:2px solid #c17cff;color:#d995ff;font-size:31px;box-shadow:0 0 22px rgba(174,88,255,.35),inset 0 0 18px rgba(174,88,255,.12)}.saved-heading h1{margin:0 0 7px;font:700 clamp(30px,3.3vw,43px) 'Work Sans',sans-serif;letter-spacing:-.035em;color:#f5f1f7}.saved-heading h1 em{font-style:normal;background:linear-gradient(90deg,#fff,#e09bff,#a96eff);-webkit-background-clip:text;background-clip:text;color:transparent}.saved-heading p{margin:0;color:#c4bdca;font-size:14px}.saved-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}.saved-tabs{display:flex;gap:10px;flex-wrap:wrap}.saved-tabs button{border:1px solid rgba(255,255,255,.10);background:rgba(13,13,22,.55);color:#c8c1cf;border-radius:999px;padding:11px 20px;font:500 13px 'Work Sans',sans-serif;cursor:pointer;transition:.18s}.saved-tabs button:hover{border-color:rgba(242,154,216,.35);color:#fff}.saved-tabs button.active{color:#fff;border-color:#d76ce8;background:linear-gradient(100deg,rgba(130,54,166,.58),rgba(92,53,146,.30));box-shadow:0 8px 25px rgba(174,71,226,.14)}.saved-tools{display:flex;align-items:center;gap:8px}.saved-tools select{height:42px;min-width:145px;padding:0 14px;border:1px solid rgba(255,255,255,.10);border-radius:11px;background:#0c0c15;color:#ddd6e2;font:500 13px 'Work Sans',sans-serif}.saved-view{width:42px;height:42px;border-radius:11px;border:1px solid rgba(255,255,255,.10);background:#0b0b13;color:#aaa3b1;font-size:20px;cursor:pointer}.saved-view.active{color:#f4b3ff;border-color:#d16fe9;background:rgba(109,50,143,.25)}.saved-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.saved-card{min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.10);border-radius:16px;background:#0b0b13;position:relative;transition:.2s;cursor:pointer}.saved-card:hover{transform:translateY(-4px);border-color:rgba(242,154,216,.45);box-shadow:0 18px 40px rgba(0,0,0,.35)}.saved-poster-wrap{position:relative;aspect-ratio:1.52/1;overflow:hidden;background:linear-gradient(145deg,#292038,#090911)}.saved-poster{width:100%;height:100%;object-fit:cover;display:block}.saved-poster-wrap:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(5,5,10,.92));pointer-events:none}.saved-badge{position:absolute;z-index:2;top:12px;left:12px;padding:7px 12px;border-radius:999px;font-size:11px;font-weight:600;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);background:rgba(20,14,29,.78);color:#dca4ff}.saved-badge.favorite{color:#ff7181;border-color:rgba(255,85,108,.35)}.saved-menu{position:absolute;z-index:3;right:10px;top:10px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(8,8,14,.60);color:#eee;font-size:18px;cursor:pointer}.saved-card-actions{position:absolute;z-index:4;right:10px;top:10px;display:flex;gap:6px}.saved-card-actions .saved-action-btn{width:34px;height:34px}.saved-card-actions .saved-action-btn svg{width:18px;height:18px}.saved-card-info{padding:11px 13px 14px}.saved-card-title{font-size:15px;color:#f2edf5;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.saved-card-meta{display:flex;justify-content:space-between;gap:8px;margin-top:7px;color:#9d96a6;font-size:12px}.saved-rating{color:#ffd35e}.saved-card-date{margin-top:13px;color:#817a89;font-size:11px}.saved-more{display:block;margin:15px auto 0;border:1px solid rgba(255,255,255,.10);background:rgba(12,12,20,.65);color:#df9dff;border-radius:999px;padding:11px 20px;font:600 12px 'Work Sans',sans-serif;cursor:pointer}.saved-more:hover{border-color:#d66ee9;background:rgba(96,45,127,.2)}.saved-empty{grid-column:1/-1;min-height:280px;border:1px dashed rgba(255,255,255,.12);border-radius:18px;display:grid;place-items:center;text-align:center;color:#918999;background:rgba(9,9,15,.35);padding:30px}.saved-empty strong{display:block;color:#e8e0ed;font-size:17px;margin-bottom:7px}.saved-list-view{display:flex;flex-direction:column;gap:12px}.saved-list-view .saved-card{display:grid;grid-template-columns:180px 1fr;min-height:125px}.saved-list-view .saved-poster-wrap{aspect-ratio:auto;height:100%}.saved-list-view .saved-card-info{display:flex;flex-direction:column;justify-content:center}.saved-list-view .saved-card-title{font-size:17px}.saved-list-view .saved-card-date{margin-top:18px}@media(max-width:1050px){.saved-shell{grid-template-columns:210px minmax(0,1fr);gap:24px}.saved-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.saved-page{padding:28px 16px 60px}.saved-shell{grid-template-columns:1fr}.saved-sidebar{display:none}.saved-heading{margin-bottom:24px}.saved-toolbar{align-items:flex-start;flex-direction:column}.saved-tools{width:100%}.saved-tools select{flex:1}.saved-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}@media(max-width:480px){.saved-grid{grid-template-columns:1fr}.saved-heading-icon{width:48px;height:48px;font-size:25px}.saved-heading h1{font-size:27px}.saved-heading p{font-size:12px}.saved-list-view .saved-card{grid-template-columns:120px 1fr}}
+
 </style>
+
 <!-- Firebase (dùng cho khung "Hỏi Admin" — xem hướng dẫn cấu hình ở cuối phần code JS) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<!-- ================= KHẢO SÁT TÌM PHIM ================= -->
+<style>
+.movie-survey-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9900;
+  padding: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 3, 8, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.movie-survey-overlay.active {
+  display: flex;
+}
+
+.movie-survey-modal {
+  width: min(900px, 100%);
+  max-height: min(90vh, 900px);
+  overflow-y: auto;
+  background: linear-gradient(180deg, rgba(24, 21, 43, 0.98), rgba(13, 12, 28, 0.99));
+  border: 1px solid rgba(242, 154, 216, 0.25);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.movie-survey-modal .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s ease;
+}
+
+.movie-survey-modal .close-btn:hover {
+  border-color: #f29ad8;
+  background: rgba(242, 154, 216, 0.15);
+}
+
+.survey-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.survey-header h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #fff 5%, #e6a6ff 55%, #b06cff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.survey-header p {
+  color: #aaa5b8;
+  font-size: 14px;
+}
+
+.survey-section {
+  margin-bottom: 32px;
+}
+
+.survey-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.survey-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.survey-option {
+  background: rgba(31, 28, 48, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.18s ease;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 70px;
+}
+
+.survey-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(242, 154, 216, 0.55);
+}
+
+.survey-option.selected {
+  border-color: #d78af3;
+  background: linear-gradient(135deg, rgba(68, 44, 87, 0.75), rgba(27, 21, 48, 0.82));
+  box-shadow: 0 0 0 1px rgba(242, 154, 216, 0.25), 0 12px 30px rgba(139, 99, 255, 0.16);
+}
+
+.survey-option-icon {
+  font-size: 22px;
+}
+
+.survey-option-text {
+  font-size: 13px;
+}
+
+.survey-radio {
+  display: none;
+}
+
+.survey-checkbox {
+  display: none;
+}
+
+.survey-section-age .survey-options {
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.survey-section-duration .survey-options {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.survey-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.survey-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-width: 140px;
+}
+
+.survey-btn-primary {
+  background: linear-gradient(90deg, #ff8a83, #d980f3 52%, #8057e9);
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(153, 93, 230, 0.32);
+}
+
+.survey-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(153, 93, 230, 0.42);
+}
+
+.survey-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.survey-btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #d8d1df;
+}
+
+.survey-btn-secondary:hover {
+  border-color: rgba(242, 154, 216, 0.55);
+  background: rgba(242, 154, 216, 0.08);
+}
+
+.survey-note {
+  text-align: center;
+  font-size: 12px;
+  color: #aaa5b8;
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .movie-survey-modal {
+    padding: 24px;
+  }
+
+  .survey-header h2 {
+    font-size: 24px;
+  }
+
+  .survey-options {
+    grid-template-columns: 1fr;
+  }
+
+  .survey-actions {
+    flex-direction: column;
+  }
+
+  .survey-btn {
+    width: 100%;
+  }
+}
+</style>
 
 </head>
 <body>
@@ -672,206 +1266,289 @@ footer{
   <div class="eyebrow">Suất chiếu riêng cho bạn</div>
   <h1>Kể cho tui nghe <em>tâm trạng</em> của bạn,<br>tui tìm phim hợp gu.</h1>
   <p class="subtitle">Đây không phải bảng đánh giá bộ phim hoặc website chiếu phim mà chỉ là một gợi ý dựa trên tâm trạng của bạn. Lưu ý: Tuyệt đối nghiêm cấm hành vi coi phim trên những website lậu, hãy coi phim một cách có văn minh. (Nếu bạn muốn đề xuất thêm phim hoặc báo lỗi dữ liệu, hãy nhấn vào biểu tượng chat ở góc dưới bên phải.). Xin cảm ơn.</p>
-  <button class="start-btn" onclick="handleStartClick()">Bắt đầu chọn phim</button>
+  <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+    <button class="start-btn" onclick="handleStartClick()">Bắt đầu chọn phim</button>
+    <button class="start-btn" onclick="openSurvey()" style="background: linear-gradient(90deg, #ff8a83, #d980f3 52%, #8057e9); box-shadow: 0 8px 24px -8px rgba(255, 138, 131, 0.6);">📋 Khảo sát 5 câu</button>
+  </div>
 </section>
 <div class="sprocket-row">
   <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
 </div>
 
+
+<!-- ================= NEW HOME UI ================= -->
+<section class="home-app" id="homeApp">
+  <div class="home-backdrop" id="homeBackdrop"></div>
+
+  <header class="home-header">
+    <a href="#" class="home-brand" onclick="goHome();return false;">
+      <div class="brand-cat">🐱</div>
+      <div class="brand-copy">
+        <div class="brand-name">MEO MEO</div>
+        <span class="brand-sub">FIND MOVIE</span>
+      </div>
+    </a>
+
+    <nav class="home-nav" aria-label="Điều hướng">
+      <a href="#homeApp" class="active" onclick="goHome();return false;">Trang chủ</a>
+      <a href="#savedPage" id="savedNavLink" onclick="openSavedPage();return false;">♡ Đã lưu</a>
+      <a href="https://www.facebook.com/share/1BksAw6oNj/?mibextid=wwXIfr" target="_blank">♧ Giới thiệu</a>
+    </nav>
+
+    <div class="home-header-actions">
+      <div class="home-profile-wrap">
+        <button class="home-profile" type="button" onclick="toggleProfileMenu()">
+          <span class="home-avatar" id="homeAvatar">🐱</span>
+          <span id="homeGreeting">Xin chào!</span>
+          <span class="home-chevron">⌄</span>
+        </button>
+        <div class="profile-menu" id="profileMenu">
+          <button type="button" onclick="openAuthModal()">Rời bỏ Meomeo</button>
+          <button type="button" onclick="startFromHeader()">Bắt đầu chọn phim</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="saved-page" id="savedPage" aria-hidden="true">
+    <div class="saved-shell">
+      <aside class="saved-sidebar">
+        <div class="saved-side-group">
+          <button type="button" class="active" data-saved-tab="all" onclick="setSavedTab('all')"><span>◉</span> Tổng quan</button>
+          <button type="button" data-saved-tab="favorite" onclick="setSavedTab('favorite')"><span>♡</span> Yêu thích</button>
+          <button type="button" data-saved-tab="saved" onclick="setSavedTab('saved')"><span>▱</span> Đã lưu</button>
+        </div>
+        <div class="saved-stat-card">
+          <div class="saved-stat-title">Thống kê của bạn</div>
+          <div class="saved-stat-row pink"><b id="savedFavoriteCount">0</b><span><strong>Yêu thích</strong><small>Phim bạn thích</small></span></div>
+          <div class="saved-stat-row purple"><b id="savedSavedCount">0</b><span><strong>Đã lưu</strong><small>Để xem sau</small></span></div>
+          <div class="saved-stat-row orange"><b id="savedDaysCount">0</b><span><strong>Ngày đồng hành</strong><small>Cùng Mèo Mèo</small></span></div>
+        </div>
+        <div class="saved-note"><span>🐱</span><p>Cảm ơn bạn đã cùng Mèo Mèo đi tìm những bộ phim tuyệt vời! ✨</p></div>
+      </aside>
+
+      <main class="saved-main">
+        <div class="saved-heading">
+          <div class="saved-heading-icon">◷</div>
+          <div><h1>Yêu thích <em>& Đã lưu</em></h1><p>Những bộ phim bạn đã yêu thích hoặc lưu lại để xem sau.</p></div>
+        </div>
+        <div class="saved-toolbar">
+          <div class="saved-tabs" role="tablist">
+            <button class="active" data-saved-tab="all" onclick="setSavedTab('all')">Tất cả</button>
+            <button data-saved-tab="favorite" onclick="setSavedTab('favorite')">Yêu thích</button>
+            <button data-saved-tab="saved" onclick="setSavedTab('saved')">Đã lưu</button>
+          </div>
+          <div class="saved-tools"><select id="savedSort" onchange="renderSavedPage()"><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="rating">Điểm cao nhất</option></select><button id="savedGridBtn" class="saved-view active" onclick="setSavedView('grid')">▦</button><button id="savedListBtn" class="saved-view" onclick="setSavedView('list')">☷</button></div>
+        </div>
+        <div class="saved-grid" id="savedMovieGrid"></div>
+        <button class="saved-more" id="savedMoreBtn" onclick="renderSavedPage(true)">↻ &nbsp; Tải thêm phim</button>
+      </main>
+    </div>
+  </section>
+
+  <div class="home-content">
+    <div class="home-hero">
+      <div class="home-cat">🐱</div>
+      <div class="home-kicker">Suất chiếu riêng cho bạn</div>
+      <h1 class="home-title">Hôm nay bạn<br><span class="gradient">muốn xem gì?</span></h1>
+      <p class="home-subtitle">Chọn một tâm trạng, Mèo sẽ tìm phim phù hợp cho bạn</p>
+
+      <button class="home-recommend" id="homeRecommend" type="button" onclick="recommendFromHome()">✨ &nbsp;Gợi ý phim cho tôi</button>
+      <span class="home-arrow">↝</span>
+    </div>
+
+    <section class="home-section" id="homePopular">
+      <div class="home-section-head">
+        <div class="home-section-title"><span>🔥</span>Phim được yêu thích</div>
+      </div>
+      <div class="home-row-wrap">
+        <div class="home-movie-row" id="homePopularRow"></div>
+      </div>
+      <div class="home-pagination" id="homePopularPagination">
+        <div class="home-pagination-nav">
+          <button class="home-page-btn" type="button" id="homePopularPrevBtn" onclick="homePopularPrevPage()">← Quay lại</button>
+          <button class="home-page-btn primary" type="button" id="homePopularNextBtn" onclick="homePopularNextPage()">Xem thêm →</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-section" id="homeSuggested">
+      <div class="home-section-head">
+        <div class="home-section-title"><span>✨</span>Có thể bạn sẽ thích</div>
+        <button class="home-see-all" type="button" onclick="openAllMovies()">Chọn lại-></button>
+      </div>
+      <div class="home-row-wrap">
+        <div class="home-movie-row" id="homeSuggestedRow"></div>
+      </div>
+      <div class="home-pagination" id="homeSuggestedPagination">
+        <div class="home-pagination-nav">
+          <button class="home-page-btn" type="button" id="homeSuggestedPrevBtn" onclick="homeResultsPrevPage()">← Quay lại</button>
+          <button class="home-page-btn primary" type="button" id="homeSuggestedNextBtn" onclick="homeResultsNextPage()">Xem thêm →</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="home-fade-bottom"></div>
+</section>
+
+<section id="auth" class="auth-section" aria-label="Xác thực tài khoản">
+  <div class="auth-backdrop" onclick="closeAuthModal()"></div>
+  <div class="auth-modal-shell" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button type="button" class="auth-modal-close" onclick="closeAuthModal()" aria-label="Đóng">✕</button>
+
+    <aside class="auth-showcase" aria-hidden="true">
+      <div class="auth-brand">
+        <span class="auth-brand-icon">🐱</span>
+        <span><b>MEO MEO</b><small>FIND MOVIE</small></span>
+      </div>
+      <div class="auth-showcase-copy">
+
+        <div class="auth-kicker">Suất chiếu riêng cho bạn</div>
+        <h2>Khám phá những bộ phim<br><span>hợp với bạn.</span></h2>
+        <p>Đăng nhập để lưu phim yêu thích, xem lại lịch sử và nhận gợi ý cá nhân hóa từ Mèo Mèo.</p>
+        <div class="auth-benefits">
+          <div><i>♡</i><span><b>Lưu phim yêu thích</b><small>Xem lại bất cứ lúc nào</small></span></div>
+          <div><i>◷</i><span><b>Lịch sử xem</b><small>Tiếp tục nơi bạn đã dừng</small></span></div>
+          <div><i>☺</i><span><b>Gợi ý cá nhân hóa</b><small>Phim phù hợp với sở thích</small></span></div>
+        </div>
+      </div>
+      <div class="auth-showcase-foot">Powered by <b>TMDB</b></div>
+    </aside>
+
+    <div class="auth-modal-card">
+      <div id="authForms">
+        <div class="auth-form active" id="formLogin">
+          <button type="button" class="auth-back-link auth-back-hidden">← Quay lại trang chủ</button>
+          <div class="auth-title-row"><div><h2 id="authTitle">Đăng nhập</h2><p>Chào mừng bạn quay trở lại! 👋</p></div></div>
+          <div class="auth-field"><label for="loginEmail">Email</label><div class="auth-input-wrap"><span>✉</span><input type="email" id="loginEmail" placeholder="Nhập email của bạn" autocomplete="email" onkeydown="if(event.key==='Enter') handleLogin()"></div></div>
+          <div class="auth-field"><label for="loginPassword">Mật khẩu</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="loginPassword" placeholder="Nhập mật khẩu của bạn" autocomplete="current-password" onkeydown="if(event.key==='Enter') handleLogin()"><button type="button" class="auth-eye" onclick="toggleAuthPasswordV2('loginPassword',this)">◉</button></div></div>
+          <div class="auth-options"><label><input type="checkbox" id="rememberLogin"> <span>Ghi nhớ đăng nhập</span></label><button type="button" onclick="showForgotPasswordForm()">Quên mật khẩu?</button></div>
+          <button type="button" class="auth-submit auth-gradient" onclick="handleLogin()">Đăng nhập <b>→</b></button>
+          <p class="auth-bottom">Chưa có tài khoản? <button type="button" onclick="switchAuthTab('register')">Đăng ký ngay</button></p>
+          <p class="auth-msg" id="msgLogin"></p>
+        </div>
+
+        <div class="auth-form" id="formRegister">
+          <button type="button" class="auth-back-link" onclick="switchAuthTab('login')">← Quay lại đăng nhập</button>
+          <div class="auth-field"><label for="registerName">Họ và tên</label><div class="auth-input-wrap"><span>♙</span><input type="text" id="registerName" placeholder="Nhập họ và tên" autocomplete="name"></div></div>
+          <div class="auth-field"><label for="registerEmail">Email</label><div class="auth-input-wrap"><span>✉</span><input type="email" id="registerEmail" placeholder="Nhập email của bạn" autocomplete="email"></div></div>
+          <div class="auth-field"><label for="registerPassword">Mật khẩu</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="registerPassword" placeholder="Tạo mật khẩu (ít nhất 6 ký tự)" autocomplete="new-password"><button type="button" class="auth-eye" onclick="toggleAuthPasswordV2('registerPassword',this)">◉</button></div></div>
+          <div class="auth-field"><label for="registerPasswordConfirm">Xác nhận mật khẩu</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="registerPasswordConfirm" placeholder="Nhập lại mật khẩu" autocomplete="new-password" onkeydown="if(event.key==='Enter') handleRegister()"><button type="button" class="auth-eye" onclick="toggleAuthPasswordV2('registerPasswordConfirm',this)">◉</button></div></div>
+          <button type="button" class="auth-submit auth-gradient" onclick="handleRegister()">Đăng ký</button>
+          <p class="auth-bottom">Đã có tài khoản? <button type="button" onclick="switchAuthTab('login')">Đăng nhập</button></p>
+          <p class="auth-msg" id="msgRegister"></p>
+        </div>
+
+        <div class="auth-form" id="formForgotEmail">
+          <button type="button" class="auth-back-link" onclick="switchAuthTab('login')">← Quay lại đăng nhập</button>
+          <div class="auth-field"><label for="forgotEmail">Email</label><div class="auth-input-wrap"><span>✉</span><input type="email" id="forgotEmail" placeholder="Nhập email của bạn" autocomplete="email" onkeydown="if(event.key==='Enter') sendForgotPasswordOtp()"></div></div>
+          <button type="button" class="auth-submit auth-gradient" onclick="sendForgotPasswordOtp()">Gửi mã OTP</button>
+          <p class="auth-note"><b>Lưu ý</b><span>Nhập email bạn đã đăng ký để nhận mã OTP đặt lại mật khẩu.</span></p>
+          <p class="auth-bottom"><button type="button" onclick="switchAuthTab('login')">Quay lại đăng nhập</button></p>
+          <p class="auth-msg" id="msgForgotEmail"></p>
+        </div>
+
+        <div class="auth-form" id="formForgotReset">
+          <button type="button" class="auth-back-link" onclick="switchAuthTab('login')">← Quay lại đăng nhập</button>
+          <div class="auth-title-row"><div><h2>Đặt lại mật khẩu</h2><p>Mã xác minh đã được gửi tới <b id="forgotTargetEmail"></b>.</p></div></div>
+          <div class="auth-field"><label for="forgotOtpInput">Mã OTP</label><div class="auth-input-wrap"><span>✦</span><input type="text" id="forgotOtpInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="letter-spacing:7px;text-align:center" onkeydown="if(event.key==='Enter') submitNewPasswordFromOtp()"></div></div>
+          <div class="auth-field"><label for="forgotNewPassword">Mật khẩu mới</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="forgotNewPassword" placeholder="Mật khẩu mới" autocomplete="new-password"><button type="button" class="auth-eye" onclick="toggleAuthPasswordV2('forgotNewPassword',this)">◉</button></div></div>
+          <div class="auth-field"><label for="forgotNewPasswordConfirm">Nhập lại mật khẩu mới</label><div class="auth-input-wrap"><span>♙</span><input type="password" id="forgotNewPasswordConfirm" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" onkeydown="if(event.key==='Enter') submitNewPasswordFromOtp()"></div></div>
+          <button type="button" class="auth-submit auth-gradient" onclick="submitNewPasswordFromOtp()">Đổi mật khẩu</button>
+          <div class="auth-reset-actions"><button type="button" onclick="resendForgotPasswordOtp()">Gửi lại mã</button><button type="button" onclick="switchAuthTab('login')">Hủy, quay lại</button></div>
+          <p class="auth-msg" id="msgForgotReset"></p>
+        </div>
+
+        <div class="auth-form" id="formOtp">
+          <button type="button" class="auth-back-link" onclick="cancelOtpFlow()">← Quay lại đăng ký</button>
+          <div class="auth-field"><label for="otpInput">Mã xác minh</label><div class="auth-input-wrap"><span>✦</span><input type="text" id="otpInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="letter-spacing:7px;text-align:center" onkeydown="if(event.key==='Enter') verifyOtpAndFinishRegister()"></div></div>
+          <button type="button" class="auth-submit auth-gradient" onclick="verifyOtpAndFinishRegister()">Xác nhận</button>
+          <div class="auth-reset-actions"><button type="button" onclick="resendOtp()">Gửi lại mã</button><button type="button" onclick="cancelOtpFlow()">Hủy, quay lại</button></div>
+          <p class="auth-msg" id="msgOtp"></p>
+        </div>
+      </div>
+
+      <div class="auth-loggedin" id="authLoggedIn">
+        <div class="auth-avatar" id="authAvatar">?</div><div class="auth-email" id="authEmail"></div><div class="auth-sub">Đã đăng nhập</div>
+        <div class="auth-actions"><button class="nav-btn" onclick="logout()">Tạm biệt Meomeo</button></div>
+        <button type="button" onclick="deleteOwnAccount()" style="margin-top:14px;background:transparent;border:none;color:var(--ember);font-family:'Work Sans',sans-serif;font-size:12px;cursor:pointer;text-decoration:underline;opacity:.75;">Xóa tài khoản của tôi</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <main class="wrap">
 
-<section id="auth" class="auth-section">
-  <div class="auth-card">
-    <div id="authForms">
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Đăng nhập</button>
-        <button type="button" class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Đăng ký</button>
-      </div>
+<section id="quiz" aria-hidden="true">
+  <div class="quiz-backdrop" onclick="closeQuiz()"></div>
+  <div class="quiz-modal" role="dialog" aria-modal="true" aria-labelledby="quizTitle">
+    <button class="quiz-close" type="button" onclick="closeQuiz()" aria-label="Đóng">✕</button>
+    <div class="progress-track" id="progressTrack"></div>
 
-      <div class="auth-form active" id="formLogin">
-        <div class="auth-field">
-          <label for="loginEmail">Email Gmail</label>
-          <input type="email" id="loginEmail" placeholder="banthan@gmail.com" autocomplete="email" onkeydown="if(event.key==='Enter') handleLogin()">
-        </div>
-        <div class="auth-field">
-          <label for="loginPassword">Mật khẩu</label>
-          <input type="password" id="loginPassword" placeholder="Mật khẩu của bạn" autocomplete="current-password" onkeydown="if(event.key==='Enter') handleLogin()">
-        </div>
-        <button type="button" class="auth-submit" onclick="handleLogin()">Đăng nhập</button>
-        <button type="button" onclick="showForgotPasswordForm()" style="margin-top:10px; background:transparent; border:none; color:var(--gold-dim); font-size:12.5px; cursor:pointer; text-decoration:underline;">Quên mật khẩu?</button>
-        <p class="auth-msg" id="msgLogin"></p>
-      </div>
-
-      <div class="auth-form" id="formForgotEmail">
-        <div class="auth-field">
-          <label for="forgotEmail">Nhập email tài khoản của bạn</label>
-          <input type="email" id="forgotEmail" placeholder="banthan@gmail.com" autocomplete="email" onkeydown="if(event.key==='Enter') sendForgotPasswordOtp()">
-        </div>
-        <button type="button" class="auth-submit" onclick="sendForgotPasswordOtp()">Gửi mã xác minh</button>
-        <button type="button" onclick="switchAuthTab('login')" style="margin-top:10px; background:transparent; border:none; color:var(--slate); font-size:12.5px; cursor:pointer; text-decoration:underline;">Quay lại đăng nhập</button>
-        <p class="auth-msg" id="msgForgotEmail"></p>
-      </div>
-
-      <div class="auth-form" id="formForgotReset">
-        <div class="auth-field">
-          <label for="forgotOtpInput">Nhập mã xác minh</label>
-          <p style="color:var(--slate); font-size:12.5px; margin-bottom:10px;">Mã gồm 6 số vừa được gửi tới <b id="forgotTargetEmail" style="color:var(--paper);"></b>. Mã có hiệu lực trong 10 phút.</p>
-          <input type="text" id="forgotOtpInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="letter-spacing:6px; font-size:20px; text-align:center;">
-        </div>
-        <div class="auth-field">
-          <label for="forgotNewPassword">Mật khẩu mới</label>
-          <input type="password" id="forgotNewPassword" placeholder="Mật khẩu mới" autocomplete="new-password">
-        </div>
-        <div class="auth-field">
-          <label for="forgotNewPasswordConfirm">Nhập lại mật khẩu mới</label>
-          <input type="password" id="forgotNewPasswordConfirm" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" onkeydown="if(event.key==='Enter') submitNewPasswordFromOtp()">
-        </div>
-        <button type="button" class="auth-submit" onclick="submitNewPasswordFromOtp()">Đổi mật khẩu</button>
-        <p class="auth-msg" id="msgForgotReset"></p>
-        <div style="display:flex; justify-content:space-between; margin-top:10px;">
-          <button type="button" onclick="resendForgotPasswordOtp()" style="background:transparent; border:none; color:var(--gold-dim); font-size:12px; cursor:pointer; text-decoration:underline;">Gửi lại mã</button>
-          <button type="button" onclick="switchAuthTab('login')" style="background:transparent; border:none; color:var(--slate); font-size:12px; cursor:pointer; text-decoration:underline;">Hủy, quay lại</button>
-        </div>
-      </div>
-
-      <div class="auth-form" id="formRegister">
-        <div class="auth-field">
-          <label for="registerEmail">Email Gmail</label>
-          <input type="email" id="registerEmail" placeholder="banthan@gmail.com" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('registerPassword').focus()">
-        </div>
-        <div class="auth-field">
-          <label for="registerPassword">Mật khẩu</label>
-          <input type="password" id="registerPassword" placeholder="Tạo mật khẩu" autocomplete="new-password" onkeydown="if(event.key==='Enter') document.getElementById('registerPasswordConfirm').focus()">
-        </div>
-        <div class="auth-field">
-          <label for="registerPasswordConfirm">Nhập lại mật khẩu</label>
-          <input type="password" id="registerPasswordConfirm" placeholder="Nhập lại mật khẩu" autocomplete="new-password" onkeydown="if(event.key==='Enter') handleRegister()">
-        </div>
-        <button type="button" class="auth-submit" onclick="handleRegister()">Đăng ký</button>
-        <p class="auth-msg" id="msgRegister"></p>
-      </div>
-
-      <div class="auth-form" id="formOtp">
-        <div class="auth-field">
-          <label for="otpInput">Nhập mã xác minh</label>
-          <p style="color:var(--slate); font-size:12.5px; margin-bottom:10px;">Mã gồm 6 số vừa được gửi tới <b id="otpTargetEmail" style="color:var(--paper);"></b>. Mã có hiệu lực trong 10 phút.</p>
-          <input type="text" id="otpInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="letter-spacing:6px; font-size:20px; text-align:center;" onkeydown="if(event.key==='Enter') verifyOtpAndFinishRegister()">
-        </div>
-        <button type="button" class="auth-submit" onclick="verifyOtpAndFinishRegister()">Xác nhận</button>
-        <p class="auth-msg" id="msgOtp"></p>
-        <div style="display:flex; justify-content:space-between; margin-top:10px;">
-          <button type="button" onclick="resendOtp()" style="background:transparent; border:none; color:var(--gold-dim); font-size:12px; cursor:pointer; text-decoration:underline;">Gửi lại mã</button>
-          <button type="button" onclick="cancelOtpFlow()" style="background:transparent; border:none; color:var(--slate); font-size:12px; cursor:pointer; text-decoration:underline;">Hủy, quay lại</button>
-        </div>
+    <!-- STEP 1: mood -->
+    <div class="step active" data-step="1">
+      <div class="step-label">Bước 1 / 5</div>
+      <h2 id="quizTitle">Tâm trạng của bạn lúc này?</h2>
+      <p class="hint">Chọn một tâm trạng, Meo sẽ tìm phim phù hợp cho bạn.</p>
+      <div class="options" id="opt-mood"></div>
+      <div class="step-nav">
+        <button class="nav-btn" type="button" onclick="closeQuiz()">Hủy</button>
+        <button class="nav-btn primary" type="button" onclick="nextStep()" disabled id="next1">Tiếp tục</button>
       </div>
     </div>
 
-    <div class="auth-loggedin" id="authLoggedIn">
-      <div class="auth-avatar" id="authAvatar">?</div>
-      <div class="auth-email" id="authEmail"></div>
-      <div class="auth-sub">Đã đăng nhập</div>
-      <div class="auth-actions">
-        <button class="nav-btn primary" onclick="startQuiz()">Bắt đầu chọn phim</button>
-        <button class="nav-btn" onclick="logout()">Đăng xuất</button>
+    <!-- STEP 2: feeling -->
+    <div class="step" data-step="2">
+      <div class="step-label">Bước 2 / 5</div>
+      <h2>Sở thích xem hôm nay?</h2>
+      <p class="hint">Chọn tối đa 2 cảm giác bạn muốn bộ phim mang lại.</p>
+      <div class="options" id="opt-feeling"></div>
+      <div class="step-nav">
+        <button class="nav-btn" type="button" onclick="prevStep()">Quay lại</button>
+        <button class="nav-btn primary" type="button" onclick="nextStep()" disabled id="next2">Tiếp tục</button>
       </div>
-      <button type="button" onclick="deleteOwnAccount()" style="margin-top:14px; background:transparent; border:none; color:var(--ember); font-family:'Work Sans',sans-serif; font-size:12px; cursor:pointer; text-decoration:underline; opacity:0.75;">Xóa tài khoản của tôi</button>
     </div>
 
-    <div class="legal-box">
-      <details class="legal-details">
-        <summary>Điều khoản sử dụng</summary>
-        <ol>
-          <li>Nghiêm cấm mọi hành vi tấn công, xâm nhập trái phép vào hệ thống dưới bất kỳ hình thức nào (DDoS, SQL injection, brute-force mật khẩu, v.v.).</li>
-          <li>Nghiêm cấm hack, can thiệp, chỉnh sửa mã nguồn, cơ sở dữ liệu hoặc luồng vận hành của web khi chưa được cho phép.</li>
-          <li>Nghiêm cấm sao chép, phân phối lại toàn bộ hoặc một phần nội dung, mã nguồn của web nhằm mục đích thương mại mà không có sự đồng ý bằng văn bản.</li>
-          <li>Nghiêm cấm lợi dụng lỗ hổng bảo mật (nếu phát hiện) để trục lợi, đánh cắp dữ liệu người dùng khác hoặc gây gián đoạn dịch vụ — vui lòng báo lại qua mục "Hỏi Admin" thay vì khai thác.</li>
-          <li>Nghiêm cấm spam, gửi nội dung rác, phản cảm hoặc quấy rối qua tính năng nhắn tin với Admin.</li>
-          <li>Bạn tự chịu trách nhiệm bảo mật thông tin đăng nhập (email, mật khẩu) của chính mình.</li>
-          <li>Chúng tôi có quyền tạm khóa tài khoản vi phạm các điều khoản trên mà không cần báo trước. Việc xóa tài khoản là quyền của chính chủ tài khoản, thực hiện qua mục "Xóa tài khoản của tôi".</li>
-          <li>Nội dung gợi ý phim mang tính chất tham khảo, giải trí cá nhân, không đại diện cho bất kỳ nhà phát hành hay đơn vị phim ảnh nào.</li>
-        </ol>
-      </details>
+    <!-- STEP 3: genre -->
+    <div class="step" data-step="3">
+      <div class="step-label">Bước 3 / 5</div>
+      <h2>Bạn thích thể loại gì?</h2>
+      <p class="hint">Chọn tối đa 3 thể loại bạn muốn xem.</p>
+      <div class="options" id="opt-genre"></div>
+      <div class="step-nav">
+        <button class="nav-btn" type="button" onclick="prevStep()">Quay lại</button>
+        <button class="nav-btn primary" type="button" onclick="nextStep()" disabled id="next3">Tiếp tục</button>
+      </div>
+    </div>
 
-      <details class="legal-details">
-        <summary>Chính sách bảo mật</summary>
-        <ol>
-          <li>Chúng tôi chỉ lưu trữ email và mật khẩu bạn cung cấp để phục vụ việc đăng nhập, không thu thập thêm thông tin cá nhân nào khác.</li>
-          <li>Tin nhắn trong tính năng "Hỏi Admin" chỉ hiển thị giữa bạn và quản trị viên, không công khai cho người dùng khác xem được.</li>
-          <li>Chúng tôi không bán, trao đổi hoặc cho thuê dữ liệu người dùng cho bất kỳ bên thứ ba nào.</li>
-          <li>Dữ liệu và hình ảnh phim sử dụng trong web được cung cấp bởi TMDB (The Movie Database).</li>
-          <li>Bạn có thể yêu cầu xóa tài khoản cùng toàn bộ dữ liệu liên quan bất cứ lúc nào bằng cách liên hệ qua mục "Hỏi Admin".</li>
-        </ol>
-      </details>
+    <!-- STEP 4: age -->
+    <div class="step" data-step="4">
+      <div class="step-label">Bước 4 / 5</div>
+      <h2>Độ tuổi của bạn?</h2>
+      <p class="hint">Meo sẽ lọc những phim có độ tuổi phù hợp.</p>
+      <div class="options" id="opt-age"></div>
+      <div class="step-nav">
+        <button class="nav-btn" type="button" onclick="prevStep()">Quay lại</button>
+        <button class="nav-btn primary" type="button" onclick="nextStep()" disabled id="next4">Tiếp tục</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: time -->
+    <div class="step" data-step="5">
+      <div class="step-label">Bước 5 / 5</div>
+      <h2>Thời gian xem?</h2>
+      <p class="hint">Chọn thời lượng phù hợp với buổi xem của bạn.</p>
+      <div class="options" id="opt-time"></div>
+      <div class="step-nav">
+        <button class="nav-btn" type="button" onclick="prevStep()">Quay lại</button>
+        <button class="nav-btn primary" type="button" onclick="showResults()" disabled id="next5">✨ Xem phim dành cho tôi</button>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="quiz">
-  <div class="progress-track" id="progressTrack"></div>
-
-  <!-- STEP 1: mood -->
-  <div class="step active" data-step="1">
-    <div class="step-label">Bước 1 / 5</div>
-    <h2>Ngay lúc này, bạn đang thấy sao?</h2>
-    <p class="hint">Chọn cái gần đúng nhất, không cần suy nghĩ quá lâu.</p>
-    <div class="options" id="opt-mood"></div>
-    <div class="step-nav">
-      <button class="nav-btn" disabled>Quay lại</button>
-      <button class="nav-btn primary" onclick="nextStep()" disabled id="next1">Tiếp tục</button>
-    </div>
-  </div>
-
-  <!-- STEP 2: desired feeling -->
-  <div class="step" data-step="2">
-    <div class="step-label">Bước 2 / 5</div>
-    <h2>Xem xong, bạn muốn cảm thấy gì?</h2>
-    <p class="hint">Chọn tối đa 2 điều.</p>
-    <div class="options" id="opt-feeling"></div>
-    <div class="step-nav">
-      <button class="nav-btn" onclick="prevStep()">Quay lại</button>
-      <button class="nav-btn primary" onclick="nextStep()" disabled id="next2">Tiếp tục</button>
-    </div>
-  </div>
-
-  <!-- STEP 3: age -->
-  <div class="step" data-step="3">
-    <div class="step-label">Bước 3 / 5</div>
-    <h2>Độ tuổi của bạn?</h2>
-    <p class="hint">Để tui lọc phim đúng độ tuổi phù hợp.</p>
-    <div class="options" id="opt-age"></div>
-    <div class="step-nav">
-      <button class="nav-btn" onclick="prevStep()">Quay lại</button>
-      <button class="nav-btn primary" onclick="nextStep()" disabled id="next3">Tiếp tục</button>
-    </div>
-  </div>
-
-  <!-- STEP 4: genre -->
-  <div class="step" data-step="4">
-    <div class="step-label">Bước 4 / 5</div>
-    <h2>Có thể loại nào bạn khoái hơn không?</h2>
-    <p class="hint">Không bắt buộc — bỏ qua cũng được.</p>
-    <div class="options" id="opt-genre"></div>
-    <div class="step-nav">
-      <button class="nav-btn" onclick="prevStep()">Quay lại</button>
-      <button class="nav-btn primary" onclick="nextStep()" id="next4">Tiếp tục</button>
-    </div>
-  </div>
-
-  <!-- STEP 5: time -->
-  <div class="step" data-step="5">
-    <div class="step-label">Bước 5 / 5</div>
-    <h2>Tối nay bạn có bao nhiêu thời gian?</h2>
-    <p class="hint">&nbsp;</p>
-    <div class="options" id="opt-time"></div>
-    <div class="step-nav">
-      <button class="nav-btn" onclick="prevStep()">Quay lại</button>
-      <button class="nav-btn primary" onclick="showResults()" disabled id="next5">Xem gợi ý</button>
-    </div>
-  </div>
-</section>
-
-<section id="results">
+<section id="results" aria-hidden="true">
   <div class="results-head">
     <div class="step-label">Suất chiếu của bạn</div>
     <h2 id="resultsTitle">Đây là vài phim hợp với bạn lúc này</h2>
@@ -879,13 +1556,35 @@ footer{
   </div>
   <div class="tickets" id="ticketList"></div>
   <div class="genre-pagination" id="resultsPagination"></div>
-
   <div class="retake-wrap">
-    <button class="nav-btn" onclick="restart()">Chọn lại tâm trạng khác</button>
+    <button class="nav-btn" type="button" onclick="restart()">Chọn lại</button>
   </div>
 </section>
 
 </main>
+
+<div class="home-detail-overlay" id="homeMovieDetail" aria-hidden="true" onclick="closeHomeMovieDetail(event)">
+  <div class="home-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="homeDetailTitle">
+    <button type="button" class="home-detail-close" onclick="closeHomeMovieDetail()" aria-label="Dong">&times;</button>
+    <div class="home-detail-grid">
+      <div id="homeDetailPosterSlot"></div>
+      <div>
+        <div class="home-detail-kicker">Th&#244;ng tin phim</div>
+        <h2 class="home-detail-title" id="homeDetailTitle"></h2>
+        <div class="home-detail-facts">
+          <div class="home-detail-fact"><span>Th&#7875; lo&#7841;i</span><b id="homeDetailGenres"></b></div>
+          <div class="home-detail-fact"><span>&#272;&#7897; tu&#7893;i</span><b id="homeDetailAge"></b></div>
+          <div class="home-detail-fact"><span>N&#259;m s&#7843;n xu&#7845;t</span><b id="homeDetailYear"></b></div>
+        </div>
+        <p class="home-detail-copy" id="homeDetailBlurb"></p>
+        <div class="home-detail-section">
+          <h3>L&#253; do n&#234;n xem</h3>
+          <p id="homeDetailReason"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer>
   <div>Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của mình, bất cứ góp ý nào cũng rất được chào đón.</div>
@@ -913,22 +1612,25 @@ footer{
 <script>
 /* ================= DATA ================= */
 const MOODS = [
-  {key:'vui', icon:'☀️', label:'Đang vui, dư năng lượng', desc:'Muốn thứ gì sôi nổi'},
-  {key:'buon', icon:'🌧️', label:'Đang buồn, cần được hiểu', desc:'Không muốn giả vờ ổn'},
-  {key:'chualanh', icon:'🕊️', label:'Căng thẳng, cần nhẹ nhàng', desc:'Muốn thở ra một cái'},
-  {key:'hoihop', icon:'⚡', label:'Chán, cần kịch tính', desc:'Muốn tim đập nhanh hơn'},
-  {key:'trongrong', icon:'🌫️', label:'Trống rỗng, cần cảm hứng', desc:'Muốn có động lực'},
-  {key:'hoainiem', icon:'🕰️', label:'Hoài niệm, nhớ về điều gì đó', desc:'Muốn sống lại cảm giác cũ'},
+  {key:'vui', icon:'😊', label:'Vui vẻ', desc:'Phim hài, vui nhộn'},
+  {key:'chualanh', icon:'😌', label:'Chữa lành', desc:'Nhẹ nhàng, thư giãn'},
+  {key:'buon', icon:'😢', label:'Buồn', desc:'Cảm xúc, sâu lắng'},
+  {key:'hoihop', icon:'🔥', label:'Hồi hộp', desc:'Gay cấn, nghẹt thở'},
+  {key:'lamgman', icon:'💗', label:'Lãng mạn', desc:'Tình yêu, ngọt ngào'},
+  {key:'suyngam', icon:'☁️', label:'Suy ngẫm', desc:'Ý nghĩa, sâu sắc'},
+  {key:'gietgan', icon:'👻', label:'Kinh dị', desc:'Rùng rợn, ám ảnh'},
+  {key:'hanhdong', icon:'⚡', label:'Hành động', desc:'Mạnh mẽ, kịch tính'},
 ];
 
 const FEELINGS = [
-  {key:'muoncuoi', icon:'😄', label:'Cười thật sảng khoái'},
-  {key:'muonkhoc', icon:'😢', label:'Khóc một trận cho nhẹ lòng'},
-  {key:'trongrong', icon:'🔥', label:'Được truyền động lực'},
-  {key:'hoihop', icon:'😮‍💨', label:'Hồi hộp nghẹt thở'},
-  {key:'chualanh', icon:'🤍', label:'Thấy ấm lòng, dễ chịu'},
-  {key:'suyngam', icon:'🧠', label:'Có gì đó để suy ngẫm'},
-  {key:'lamgman', icon:'💛', label:'Rung động, xao xuyến'},
+  {key:'muoncuoi', icon:'😄', label:'Cười sảng khoái', desc:'Duyên dáng, giải trí'},
+  {key:'muonkhoc', icon:'😢', label:'Muốn khóc một chút', desc:'Chạm cảm xúc'},
+  {key:'trongrong', icon:'🔥', label:'Được truyền động lực', desc:'Có lửa để tiếp tục'},
+  {key:'hoihop', icon:'😮‍💨', label:'Tim đập nhanh', desc:'Căng thẳng, cuốn hút'},
+  {key:'chualanh', icon:'🤍', label:'Ấm lòng dễ chịu', desc:'Dịu dàng, an ủi'},
+  {key:'suyngam', icon:'🧠', label:'Có điều để nghĩ', desc:'Nhiều tầng ý nghĩa'},
+  {key:'lamgman', icon:'💛', label:'Rung động xao xuyến', desc:'Tình cảm, ngọt ngào'},
+  {key:'hoainiem', icon:'🕰️', label:'Hoài niệm', desc:'Gợi nhớ chuyện cũ'},
 ];
 
 const AGES = [
@@ -951,9 +1653,9 @@ const GENRES = [
 ];
 
 const TIMES = [
-  {key:'ngan', label:'Dưới 100 phút', desc:'Xem xong còn làm việc khác'},
-  {key:'vua', label:'100–150 phút', desc:'Một buổi tối trọn vẹn'},
-  {key:'thoai', label:'Không giới hạn', desc:'Sẵn sàng "cày" nguyên tối'},
+  {key:'ngan', icon:'⏱️', label:'<100 phút', desc:'Gọn nhẹ, xem nhanh'},
+  {key:'dai', icon:'🎬', label:'>100 phút', desc:'Một buổi xem trọn vẹn'},
+  {key:'series', icon:'📺', label:'Theo Tập', desc:'Phim bộ, xem nhiều tập'},
 ];
 
 // mood tag values used across movies: vui, buon, chualanh, hoihop, trongrong(=cảm hứng), hoainiem, suyngam, lamgman(romance), cuoi
@@ -1402,6 +2104,28 @@ const MOVIES = [
 let localUserStore = {};
 const authState = { user: null };
 
+// ===== Ngày đồng hành: tính theo số ngày (giờ VN, GMT+7) kể từ lần đăng nhập đầu tiên của tài khoản =====
+function vnDateString(d){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Ho_Chi_Minh',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+}
+function recordCompanionLogin(email){
+  if(!email) return;
+  const key = 'meomeo:firstlogin:'+email.trim().toLowerCase();
+  if(!localStorage.getItem(key)){
+    localStorage.setItem(key, vnDateString(new Date()));
+  }
+}
+function getCompanionDays(email){
+  if(!email) return 1;
+  const key = 'meomeo:firstlogin:'+email.trim().toLowerCase();
+  let first = localStorage.getItem(key);
+  if(!first){ first = vnDateString(new Date()); localStorage.setItem(key, first); }
+  const firstDate = new Date(first+'T00:00:00+07:00');
+  const todayDate = new Date(vnDateString(new Date())+'T00:00:00+07:00');
+  const diffDays = Math.round((todayDate - firstDate) / 86400000) + 1;
+  return Math.max(1, diffDays);
+}
+
 function isGmail(email){
   return /^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email.trim());
 }
@@ -1487,13 +2211,24 @@ function setAuthMsg(which, text, type){
 }
 
 function switchAuthTab(tab){
-  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-  document.getElementById('formLogin').classList.toggle('active', tab === 'login');
-  document.getElementById('formRegister').classList.toggle('active', tab === 'register');
-  document.getElementById('formOtp').classList.remove('active');
-  document.getElementById('formForgotEmail').classList.remove('active');
-  document.getElementById('formForgotReset').classList.remove('active');
+  // Auth hiện tại không còn dùng tabLogin/tabRegister, mà dùng các màn .auth-form.
+  // Guard null để nút "Quay lại đăng nhập" vẫn hoạt động sau khi chuyển sang màn OTP/reset.
+  const tabLogin = document.getElementById('tabLogin');
+  const tabRegister = document.getElementById('tabRegister');
+  if(tabLogin) tabLogin.classList.toggle('active', tab === 'login');
+  if(tabRegister) tabRegister.classList.toggle('active', tab === 'register');
+
+  const forms = ['formLogin','formRegister','formOtp','formForgotEmail','formForgotReset'];
+  forms.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+
+  const targetId = tab === 'register' ? 'formRegister' : 'formLogin';
+  const target = document.getElementById(targetId);
+  if(target) target.classList.add('active');
+
+  // Khi chủ động quay về login/register thì hủy phiên OTP/reset đang chờ.
   pendingRegistration = null;
   pendingPasswordReset = null;
   setAuthMsg('login', '');
@@ -1530,9 +2265,14 @@ async function handleLogin(){
 }
 
 async function handleRegister(){
+  const name = (document.getElementById('registerName')?.value || '').trim();
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
   const confirm = document.getElementById('registerPasswordConfirm').value;
+  if(!name){
+    setAuthMsg('register', 'Vui lòng nhập họ và tên.', 'error');
+    return;
+  }
   if(!isGmail(email)){
     setAuthMsg('register', 'Vui lòng nhập đúng định dạng email @gmail.com.', 'error');
     return;
@@ -1555,7 +2295,7 @@ async function handleRegister(){
     setAuthMsg('register', 'Email này đã được đăng ký rồi. Hãy chuyển sang tab "Đăng nhập" thay vì đăng ký lại.', 'error');
     return;
   }
-  await sendRegistrationOtp(email, password);
+  await sendRegistrationOtp(email, password, name);
 }
 
 /* ================= XÁC MINH EMAIL BẰNG MÃ OTP (Backend Node.js tự host) =================
@@ -1620,10 +2360,10 @@ function otpErrorMessage(error, waitSec){
   return OTP_ERROR_MESSAGES[error] || 'Xác minh thất bại. Thử lại nhé.';
 }
 
-async function sendRegistrationOtp(email, password){
+async function sendRegistrationOtp(email, password, name){
   try{
     const { expiresAt } = await requestOtp(email, 'register');
-    pendingRegistration = { email, password, expiresAt };
+    pendingRegistration = { email, password, name: name || pendingRegistration?.name || '', expiresAt };
     document.getElementById('otpTargetEmail').textContent = email;
     document.getElementById('otpInput').value = '';
     document.getElementById('msgOtp').textContent = '';
@@ -1649,7 +2389,7 @@ async function resendOtp(){
     return;
   }
   document.getElementById('msgOtp').textContent = 'Đang gửi lại mã...';
-  await sendRegistrationOtp(pendingRegistration.email, pendingRegistration.password);
+  await sendRegistrationOtp(pendingRegistration.email, pendingRegistration.password, pendingRegistration.name);
 }
 
 function cancelOtpFlow(){
@@ -1697,6 +2437,7 @@ async function verifyOtpAndFinishRegister(){
   const { email, password } = pendingRegistration;
   await saveUserRecord(email, {
     email: email.trim(),
+    displayName: pendingRegistration.name || '',
     password: await hashPassword(password, email),
     registeredAt: Date.now(),
     banned: false,
@@ -1829,7 +2570,8 @@ async function submitNewPasswordFromOtp(){
 let ownAccountWatchRef = null;
 
 function loginSuccess(email){
-  authState.user = email.trim();
+  authState.user = email.trim(); recordCompanionLogin(authState.user); updateHomeProfile(); updateHomeMoodAccess(); loadSavedState(); closeAuthModal();
+  try{ localStorage.setItem('meomeo:session', authState.user); }catch(e){}
   document.getElementById('authForms').style.display = 'none';
   document.getElementById('authLoggedIn').classList.add('active');
   document.getElementById('authAvatar').textContent = email.trim().charAt(0).toUpperCase();
@@ -1851,17 +2593,21 @@ function loginSuccess(email){
 }
 
 function logout(){
-  authState.user = null;
+  closeSavedPage();
+  authState.user = null; updateHomeProfile(); updateHomeMoodAccess();
+  try{ localStorage.removeItem('meomeo:session'); }catch(e){}
   if(ownAccountWatchRef){ ownAccountWatchRef.off(); ownAccountWatchRef = null; }
   document.getElementById('authForms').style.display = '';
   document.getElementById('authLoggedIn').classList.remove('active');
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
+  if(document.getElementById('registerName')) document.getElementById('registerName').value = '';
   document.getElementById('registerEmail').value = '';
   document.getElementById('registerPassword').value = '';
   document.getElementById('registerPasswordConfirm').value = '';
   switchAuthTab('login');
   document.getElementById('quiz').classList.remove('active');
+  document.getElementById('quiz').setAttribute('aria-hidden','true');
   document.getElementById('results').classList.remove('active');
   // Ẩn và đóng khung chat vì tính năng này chỉ dùng khi đã đăng nhập
   document.getElementById('adminChatBtn').style.display = 'none';
@@ -1872,8 +2618,8 @@ function logout(){
 
 function handleStartClick(){
   if(!authState.user){
-    document.getElementById('auth').scrollIntoView({behavior:'smooth'});
-    setAuthMsg('login', 'Đăng nhập hoặc đăng ký Gmail để bắt đầu chọn phim nhé.', 'error');
+    openAuthModal();
+    setAuthMsg('login','Đăng nhập hoặc đăng ký Gmail để bắt đầu chọn phim nhé.','error');
     return;
   }
   startQuiz();
@@ -1928,7 +2674,6 @@ function renderMulti(containerId, items, stateKey, nextBtnId, maxSelect){
         btn.classList.remove('selected');
       } else {
         if(maxSelect && state[stateKey].length >= maxSelect){
-          // replace oldest selection
           const oldest = state[stateKey].shift();
           const oldBtn = el.querySelector(`[data-key="${oldest}"]`);
           if(oldBtn) oldBtn.classList.remove('selected');
@@ -1943,8 +2688,8 @@ function renderMulti(containerId, items, stateKey, nextBtnId, maxSelect){
 
 renderSingle('opt-mood', MOODS, 'mood', 'next1');
 renderMulti('opt-feeling', FEELINGS, 'feelings', 'next2', 2);
-renderSingle('opt-age', AGES.map(a=>({key:a.key, label:a.label})), 'age', 'next3');
-renderMulti('opt-genre', GENRES, 'genres', null, null);
+renderMulti('opt-genre', GENRES, 'genres', 'next3', 3);
+renderSingle('opt-age', AGES.map(a=>({key:a.key, label:a.label})), 'age', 'next4');
 renderSingle('opt-time', TIMES, 'time', 'next5');
 
 /* ================= NAV ================= */
@@ -1959,7 +2704,7 @@ function buildProgress(){
 }
 
 function showStep(n){
-  document.querySelectorAll('.step').forEach(s=>{
+  document.querySelectorAll('#quiz .step').forEach(s=>{
     s.classList.toggle('active', Number(s.dataset.step) === n);
   });
   currentStep = n;
@@ -1967,9 +2712,22 @@ function showStep(n){
 }
 
 function startQuiz(){
+  if(!authState.user){
+    openAuthModal();
+    setAuthMsg('login','Đăng nhập hoặc đăng ký Gmail để bắt đầu chọn phim nhé.','error');
+    return;
+  }
   document.getElementById('quiz').classList.add('active');
-  document.getElementById('quiz').scrollIntoView({behavior:'smooth'});
+  document.getElementById('quiz').setAttribute('aria-hidden','false');
+  currentStep = 1;
   showStep(1);
+}
+
+function closeQuiz(){
+  const quiz=document.getElementById('quiz');
+  if(!quiz) return;
+  quiz.classList.remove('active');
+  quiz.setAttribute('aria-hidden','true');
 }
 
 function nextStep(){
@@ -1984,42 +2742,45 @@ function scoreMovie(m){
   let score = 0;
   let matchedTags = [];
 
+  // Tâm trạng là tín hiệu mạnh nhất.
   if(m.moods.includes(state.mood)){
-    score += 3;
+    score += 5;
     matchedTags.push(state.mood);
   }
-  state.feelings.forEach(f=>{
-    if(m.moods.includes(f) && !matchedTags.includes(f)){
-      score += 3;
-      matchedTags.push(f);
-    }
-  });
+
+  // Sở thích cảm giác sau khi xem.
+  if(state.feelings.length){
+    const feelingMatches = state.feelings.filter(f => m.reasons && m.reasons[f]);
+    score += feelingMatches.length * 2;
+    feelingMatches.forEach(f => {
+      if(!matchedTags.includes(f)) matchedTags.push(f);
+    });
+  }
+
+  // Sở thích thể loại.
   if(state.genres.length){
     const overlap = m.genres.filter(g=>state.genres.includes(g));
-    score += overlap.length * 2;
+    score += overlap.length * 3;
   }
+
+  // Thời lượng: ưu tiên phim nằm trong khoảng người dùng muốn xem.
   if(m.type === 'series'){
-    // Phim bộ không có thời lượng cố định — chỉ cộng điểm khi người dùng chọn "Không giới hạn".
-    if(state.time === 'thoai') score += 0.5;
+    if(state.time === 'series') score += 2;
   } else {
-    if(state.time === 'ngan' && m.runtime < 100) score += 1;
-    if(state.time === 'vua' && m.runtime >= 100 && m.runtime <= 150) score += 1;
-    if(state.time === 'thoai') score += 0.5;
+    if(state.time === 'ngan' && m.runtime < 100) score += 2;
+    if(state.time === 'dai' && m.runtime >= 100) score += 2;
   }
 
   return {movie:m, score, matchedTags};
 }
 
 function pickResults(){
-  const userAge = state.age;
-  let eligible = ALL_MOVIES.filter(m => m.age <= userAge);
-  // Nếu người dùng có chọn thể loại ở bước 4, chỉ giữ lại phim thuộc (các) thể loại đó.
-  if(state.genres.length){
-    eligible = eligible.filter(m => m.genres.some(g => state.genres.includes(g)));
-  }
-  const scored = eligible.map(scoreMovie).filter(s=>s.score > 0);
+  const userAge = Number(state.age);
+  let eligible = ALL_MOVIES.filter(m => Number(m.age || 0) <= userAge);
+
+  const scored = eligible.map(scoreMovie);
   scored.sort((a,b)=> b.score - a.score);
-  return scored;
+  return scored.filter(s=>s.score > 0);
 }
 
 const FEELING_LABEL = {};
@@ -2078,6 +2839,10 @@ function renderTicket(result){
 const RESULTS_PER_PAGE = 4;
 let currentResults = [];
 let currentResultsPage = 1;
+const HOME_RESULTS_PER_PAGE = 8;
+let homeResultsPage = 1;
+let homePopularMovies = [];
+let homePopularPage = 1;
 
 /* ---------- Đánh dấu phim đã xem (lưu theo tài khoản qua Firebase) ---------- */
 let watchedSet = new Set();
@@ -2119,19 +2884,153 @@ function wireWatchedCheckboxes(container){
 }
 
 async function showResults(){
+  if(!authState.user){
+    closeQuiz();
+    openAuthModal();
+    setAuthMsg('login','Đăng nhập để nhận gợi ý phim cá nhân hóa nhé.','error');
+    return;
+  }
+
   currentResults = pickResults();
   currentResultsPage = 1;
+  homeResultsPage = 1;
 
   const moodLabel = MOODS.find(x=>x.key===state.mood)?.label.toLowerCase() || '';
+  const genreLabels = state.genres.map(g=>homeGenreLabel(g)).join(', ');
+  const timeLabel = TIMES.find(x=>x.key===state.time)?.label || '';
+
   document.getElementById('resultsSub').textContent =
-    `Dựa trên tâm trạng "${moodLabel}" và những gì bạn muốn cảm nhận sau khi xem.`;
+    `Dựa trên tâm trạng "${moodLabel}", sở thích${genreLabels ? ` ${genreLabels}` : ''}, độ tuổi và thời gian xem ${timeLabel.toLowerCase()}.`;
 
   await loadWatchedSet();
-  renderResultsPage();
 
-  document.getElementById('quiz').classList.remove('active');
-  document.getElementById('results').classList.add('active');
-  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+  // Kết quả chính nằm ngay trong hàng “Có thể bạn sẽ thích” trên homepage.
+  const title=document.querySelector('#homeSuggested .home-section-title');
+  if(title) title.innerHTML='<span>✨</span>Phim dành riêng cho bạn';
+  await renderHomeSuggestedRow();
+
+  closeQuiz();
+  document.getElementById('results').classList.remove('active');
+  const section=document.getElementById('homeSuggested');
+  if(section) section.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ================= HOME SUGGESTED PAGINATION ================= */
+async function renderHomeSuggestedRow(){
+  const row=document.getElementById('homeSuggestedRow');
+  if(!row) return;
+
+  const totalPages = Math.max(1, Math.ceil(currentResults.length / HOME_RESULTS_PER_PAGE));
+  if(homeResultsPage > totalPages) homeResultsPage = totalPages;
+  if(homeResultsPage < 1) homeResultsPage = 1;
+
+  const start = (homeResultsPage - 1) * HOME_RESULTS_PER_PAGE;
+  const matches = currentResults.slice(start, start + HOME_RESULTS_PER_PAGE).map(x=>x.movie);
+
+  row.innerHTML = matches.length
+    ? matches.map(m=>homeMovieCard(m,homeMetaCache[m.t])).join('')
+    : '<div style="color:var(--slate);padding:24px 4px;">Chưa tìm được phim khớp với lựa chọn của bạn. Thử chọn lại nhé.</div>';
+
+  if(typeof TMDB_API_KEY!=='undefined' && matches.length){
+    await Promise.all(matches.map(async m=>{
+      if(homeMetaCache[m.t]) return;
+      try{
+        const r=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(m.t)}`);
+        const d=await r.json();
+        const hit=(d.results||[]).find(x=>x.poster_path)||d.results?.[0];
+        if(hit) homeMetaCache[m.t]={poster:hit.poster_path,rating:hit.vote_average};
+      }catch(e){}
+    }));
+    row.innerHTML=matches.map(m=>homeMovieCard(m,homeMetaCache[m.t])).join('');
+  }
+
+  renderHomeSuggestedPagination(totalPages);
+}
+
+// Hiển thị nút prev/next (không show số trang)
+function renderHomeSuggestedPagination(totalPages){
+  const wrap=document.getElementById('homeSuggestedPagination');
+  const prevBtn=document.getElementById('homeSuggestedPrevBtn');
+  const nextBtn=document.getElementById('homeSuggestedNextBtn');
+  if(!wrap||!prevBtn||!nextBtn) return;
+
+  if(!currentResults.length || totalPages<=1){
+    wrap.style.display='none';
+    return;
+  }
+  wrap.style.display='flex';
+
+  prevBtn.disabled = homeResultsPage<=1;
+  nextBtn.disabled = homeResultsPage>=totalPages;
+}
+
+// Render phim yêu thích với pagination
+function renderHomePopularRow(){
+  const row=document.getElementById('homePopularRow');
+  if(!row) return;
+  
+  const totalPages = Math.max(1, Math.ceil(homePopularMovies.length / HOME_RESULTS_PER_PAGE));
+  if(homePopularPage > totalPages) homePopularPage = totalPages;
+  if(homePopularPage < 1) homePopularPage = 1;
+  
+  const start = (homePopularPage - 1) * HOME_RESULTS_PER_PAGE;
+  const movies = homePopularMovies.slice(start, start + HOME_RESULTS_PER_PAGE);
+  
+  row.innerHTML = movies.map(m => homeMovieCard(m, homeMetaCache[m.t])).join('');
+  
+  renderHomePopularPagination(totalPages);
+}
+
+// Hiển thị pagination buttons cho phim yêu thích
+function renderHomePopularPagination(totalPages){
+  const wrap=document.getElementById('homePopularPagination');
+  const prevBtn=document.getElementById('homePopularPrevBtn');
+  const nextBtn=document.getElementById('homePopularNextBtn');
+  if(!wrap||!prevBtn||!nextBtn) return;
+
+  if(!homePopularMovies.length || totalPages<=1){
+    wrap.style.display='none';
+    return;
+  }
+  wrap.style.display='flex';
+
+  prevBtn.disabled = homePopularPage<=1;
+  nextBtn.disabled = homePopularPage>=totalPages;
+}
+
+// Chuyển sang trang tiếp theo (yêu thích)
+function homePopularNextPage(){
+  const totalPages=Math.max(1, Math.ceil(homePopularMovies.length / HOME_RESULTS_PER_PAGE));
+  if(homePopularPage<totalPages){
+    homePopularPage++;
+    renderHomePopularRow();
+    document.getElementById('homePopular')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+// Quay lại trang trước (yêu thích)
+function homePopularPrevPage(){
+  if(homePopularPage>1){
+    homePopularPage--;
+    renderHomePopularRow();
+    document.getElementById('homePopular')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+function homeResultsNextPage(){
+  const totalPages=Math.max(1, Math.ceil(currentResults.length / HOME_RESULTS_PER_PAGE));
+  if(homeResultsPage<totalPages){
+    homeResultsPage++;
+    renderHomeSuggestedRow();
+    document.getElementById('homeSuggested')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+function homeResultsPrevPage(){
+  if(homeResultsPage>1){
+    homeResultsPage--;
+    renderHomeSuggestedRow();
+    document.getElementById('homeSuggested')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 }
 
 function renderResultsPage(){
@@ -2169,13 +3068,22 @@ function renderResultsPage(){
 }
 
 function restart(){
-  state.mood = null; state.feelings = []; state.age = null; state.genres = []; state.time = null;
-  document.querySelectorAll('.opt.selected').forEach(b=>b.classList.remove('selected'));
-  ['next1','next2','next3','next5'].forEach(id=>document.getElementById(id).disabled = true);
-  document.getElementById('results').classList.remove('active');
-  document.getElementById('quiz').classList.add('active');
-  showStep(1);
-  document.getElementById('quiz').scrollIntoView({behavior:'smooth'});
+  state.mood = null;
+  state.feelings = [];
+  state.age = null;
+  state.genres = [];
+  state.time = null;
+  document.querySelectorAll('#quiz .opt.selected').forEach(b=>b.classList.remove('selected'));
+  ['next1','next3','next4'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.disabled = true;
+  });
+  const next2=document.getElementById('next2');
+  if(next2) next2.disabled=false;
+  currentResults=[];
+  homeResultsPage=1;
+  closeQuiz();
+  startQuiz();
 }
 
 buildProgress();
@@ -3026,6 +3934,402 @@ function closeDonateModal(){
 }
 
 checkAdminSecretHash();
+
+/* ================= AUTH UI HELPERS ================= */
+function toggleAuthPasswordV2(id, btn){
+  const input=document.getElementById(id); if(!input) return;
+  input.type=input.type==='password'?'text':'password';
+  if(btn) btn.textContent=input.type==='password'?'◉':'◌';
+}
+function authGoogleUnavailable(){ alert('Google Authentication chưa được cấu hình trong Firebase của phiên bản hiện tại.'); }
+function authAppleUnavailable(){ alert('Apple Authentication chưa được cấu hình trong Firebase của phiên bản hiện tại.'); }
+
+/* ================= NEW HOMEPAGE UI LOGIC ================= */
+function openAuthModal(){
+  const auth = document.getElementById('auth');
+  if(auth){
+    auth.classList.add('home-auth-modal');
+    document.body.style.overflow = 'hidden';
+    if(!auth.dataset.flow){ switchAuthTab('login'); }
+    delete auth.dataset.flow;
+  }
+  closeProfileMenu();
+}
+function closeAuthModal(){
+  const auth = document.getElementById('auth');
+  if(auth) auth.classList.remove('home-auth-modal');
+  document.body.style.overflow = '';
+}
+
+/* ================= SAVED / HISTORY ================= */
+let savedSet = new Set(), favoriteSet = new Set(), savedView = 'grid', savedTab = 'all', savedVisible = 8;
+const savedMetaCache = {};
+function savedMovieKey(m){ return movieWatchKey(m); }
+async function loadSavedState(){
+  savedSet=new Set(); favoriteSet=new Set();
+  if(authState.user && firebaseReady){
+    try{ const [s,f,w]=await Promise.all([fbDb.ref('users/'+firebaseUserKey(authState.user)+'/saved').once('value'),fbDb.ref('users/'+firebaseUserKey(authState.user)+'/favorites').once('value'),fbDb.ref('users/'+firebaseUserKey(authState.user)+'/watched').once('value')]); const sv=s.val()||{},fv=f.val()||{},wv=w.val()||{}; savedSet=new Set(Object.keys(sv).filter(k=>sv[k])); favoriteSet=new Set(Object.keys(fv).filter(k=>fv[k])); watchedSet=new Set(Object.keys(wv).filter(k=>wv[k])); }catch(e){console.warn('Không tải được danh sách cá nhân:',e)}
+  }else if(authState.user){
+    try{ savedSet=new Set(JSON.parse(localStorage.getItem('meomeo:saved:'+authState.user)||'[]')); favoriteSet=new Set(JSON.parse(localStorage.getItem('meomeo:favorites:'+authState.user)||'[]')); }catch(e){}
+  }
+}
+function bookmarkIcon(active=false){
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M6 3.5A2.5 2.5 0 0 1 8.5 1h7A2.5 2.5 0 0 1 18 3.5V21a1 1 0 0 1-1.58.81L12 18.55l-4.42 3.26A1 1 0 0 1 6 21V3.5Z" fill="${active?'currentColor':'none'}" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`;
+}
+function heartIcon(active=false){
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" fill="${active?'currentColor':'none'}" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`;
+}
+function refreshMovieActionButtons(key){
+  document.querySelectorAll(`[data-action-key="${CSS.escape(key)}"]`).forEach(btn=>{
+    const type=btn.dataset.actionType;
+    const active=type==='saved'?savedSet.has(key):favoriteSet.has(key);
+    btn.classList.toggle('on',type==='saved'&&active);
+    btn.classList.toggle('fav',type==='favorite'&&active);
+    btn.innerHTML=type==='saved'?bookmarkIcon(active):heartIcon(active);
+    btn.title=type==='saved'?(active?'Bỏ lưu':'Lưu phim'):(active?'Bỏ yêu thích':'Yêu thích');
+    btn.setAttribute('aria-pressed',String(active));
+  });
+  const isSaved=savedSet.has(key), isFav=favoriteSet.has(key);
+  document.querySelectorAll(`[data-badge-key="${CSS.escape(key)}"]`).forEach(badge=>{
+    badge.classList.toggle('show', isSaved||isFav);
+    badge.classList.toggle('fav', isFav);
+    badge.textContent = isFav?'♥ Yêu thích':isSaved?'✓ Đã lưu':'';
+  });
+}
+
+async function setSavedFlag(type,key,value){
+  const set=type==='saved'?savedSet:favoriteSet; value?set.add(key):set.delete(key);
+  if(authState.user && firebaseReady){ try{ await fbDb.ref('users/'+firebaseUserKey(authState.user)+'/'+type+'/'+key).set(!!value); }catch(e){console.warn(e)} }
+  else if(authState.user) localStorage.setItem('meomeo:'+type+':'+authState.user,JSON.stringify([...set]));
+  refreshMovieActionButtons(key);
+  renderSavedPage();
+}
+function toggleSavedMovie(key){ if(!authState.user){openAuthModal();setAuthMsg('login','Đăng nhập để lưu phim vào tài khoản nhé.','error');return} setSavedFlag('saved',key,!savedSet.has(key)); }
+function toggleFavoriteMovie(key){ if(!authState.user){openAuthModal();setAuthMsg('login','Đăng nhập để đánh dấu yêu thích nhé.','error');return} setSavedFlag('favorites',key,!favoriteSet.has(key)); }
+function openSavedPage(){
+  closeProfileMenu(); closeAuthModal(); document.getElementById('results')?.classList.remove('active'); document.getElementById('quiz')?.classList.remove('active');
+  document.querySelector('.home-content')?.classList.add('saved-home-hidden'); document.getElementById('savedPage')?.classList.add('open'); document.getElementById('savedPage')?.setAttribute('aria-hidden','false');
+  document.querySelectorAll('.home-nav a').forEach(a=>a.classList.remove('active')); document.getElementById('savedNavLink')?.classList.add('active');
+  if(!authState.user){openAuthModal();setAuthMsg('login','Đăng nhập để xem phim đã lưu của bạn nhé.','error');return;}
+  loadSavedState().then(()=>renderSavedPage()); window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeSavedPage(){ document.getElementById('savedPage')?.classList.remove('open'); document.getElementById('savedPage')?.setAttribute('aria-hidden','true'); document.querySelector('.home-content')?.classList.remove('saved-home-hidden'); document.getElementById('savedNavLink')?.classList.remove('active'); }
+function setSavedTab(tab){savedTab=tab;savedVisible=8;document.querySelectorAll('[data-saved-tab]').forEach(b=>b.classList.toggle('active',b.dataset.savedTab===tab));renderSavedPage()}
+function setSavedView(view){savedView=view;document.getElementById('savedGridBtn')?.classList.toggle('active',view==='grid');document.getElementById('savedListBtn')?.classList.toggle('active',view==='list');renderSavedPage()}
+function savedSourceMovies(){return typeof ALL_MOVIES!=='undefined'?ALL_MOVIES:(typeof MOVIES!=='undefined'?MOVIES:[])}
+function savedFilteredMovies(){
+  const source=savedSourceMovies();
+  let list=source.filter(m=>{const k=savedMovieKey(m);if(savedTab==='saved')return savedSet.has(k);if(savedTab==='favorite')return favoriteSet.has(k);return savedSet.has(k)||favoriteSet.has(k)});
+  const sort=document.getElementById('savedSort')?.value||'newest';
+  if(sort==='rating')list.sort((a,b)=>(savedMetaCache[b.t]?.rating||0)-(savedMetaCache[a.t]?.rating||0)); else list.sort((a,b)=>sort==='oldest'?(a.y||0)-(b.y||0):(b.y||0)-(a.y||0));
+  return list;
+}
+function savedCard(m){
+  const key=savedMovieKey(m),meta=savedMetaCache[m.t]||{},poster=meta.poster?'https://image.tmdb.org/t/p/w500'+meta.poster:'';
+  const isFav=favoriteSet.has(key),isSaved=savedSet.has(key);
+  const badge=isFav?'♥ Yêu thích':isSaved?'▮ Đã lưu':'Phim';
+  return `<article class="saved-card" data-key="${escapeAttr(key)}" onclick="openHomeMovieDetail(this.dataset.key)">
+    <div class="saved-poster-wrap">
+      ${poster?`<img class="saved-poster" loading="lazy" src="${poster}" alt="${escapeAttr(m.t)}">`:`<div class="saved-poster" style="display:grid;place-items:center;color:#aaa">${escapeHtml(m.t)}</div>`}
+      <span class="saved-badge ${isFav?'favorite':''}">${badge}</span>
+      <div class="saved-card-actions">
+        <button type="button" class="saved-action-btn ${isSaved?'on':''}" data-action-key="${escapeAttr(key)}" data-action-type="saved" aria-label="${isSaved?'Bỏ lưu':'Lưu phim'}" aria-pressed="${isSaved}" title="${isSaved?'Bỏ lưu':'Lưu phim'}" onclick="event.stopPropagation();toggleSavedMovie('${escapeAttr(key)}')">${bookmarkIcon(isSaved)}</button>
+        <button type="button" class="saved-action-btn ${isFav?'fav':''}" data-action-key="${escapeAttr(key)}" data-action-type="favorite" aria-label="${isFav?'Bỏ yêu thích':'Yêu thích'}" aria-pressed="${isFav}" title="${isFav?'Bỏ yêu thích':'Yêu thích'}" onclick="event.stopPropagation();toggleFavoriteMovie('${escapeAttr(key)}')">${heartIcon(isFav)}</button>
+      </div>
+    </div>
+    <div class="saved-card-info"><div class="saved-card-title">${escapeHtml(m.t)}</div><div class="saved-card-meta"><span>${m.y||'—'} · ${homeGenreLabel((m.genres||[])[0]||'')}</span><span class="saved-rating">★ ${(meta.rating||0).toFixed?Number(meta.rating||0).toFixed(1):'—'}</span></div><div class="saved-card-date">${isSaved?'Đã lưu vào danh sách':isFav?'Đã đánh dấu yêu thích':'Phim trong danh sách'}</div></div>
+  </article>`
+}
+async function renderSavedPage(loadMore=false){
+  if(loadMore)savedVisible+=8; const grid=document.getElementById('savedMovieGrid');if(!grid)return;
+  // Cập nhật thống kê ngay lập tức, không chờ TMDB tải poster/rating.
+  document.getElementById('savedFavoriteCount').textContent=favoriteSet.size;
+  document.getElementById('savedSavedCount').textContent=savedSet.size;
+  document.getElementById('savedDaysCount').textContent=getCompanionDays(authState.user);
+  if(!authState.user){grid.innerHTML='<div class="saved-empty"><div><strong>Đăng nhập để xem danh sách của bạn</strong><span>Mèo Mèo sẽ giữ lại những bộ phim bạn muốn xem.</span></div></div>';return}
+  const list=savedFilteredMovies(); const visible=list.slice(0,savedVisible);
+  if(!list.length){grid.className='saved-grid';grid.innerHTML='<div class="saved-empty"><div><strong>Chưa có phim trong mục này 🐱</strong><span>Hãy bấm ♡ hoặc nút lưu trên phim để thêm vào danh sách.</span></div></div>';document.getElementById('savedMoreBtn').style.display='none';return}
+  grid.className='saved-grid'+(savedView==='list'?' saved-list-view':''); grid.innerHTML=visible.map(savedCard).join('');document.getElementById('savedMoreBtn').style.display=visible.length<list.length?'block':'none';
+  await Promise.all(visible.filter(m=>!savedMetaCache[m.t]).map(async m=>{try{const r=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(m.t)}`);const d=await r.json();const hit=(d.results||[]).find(x=>x.poster_path)||d.results?.[0];if(hit)savedMetaCache[m.t]={poster:hit.poster_path,rating:hit.vote_average};}catch(e){}}));
+  grid.innerHTML=visible.map(savedCard).join('');
+  document.getElementById('savedFavoriteCount').textContent=favoriteSet.size;document.getElementById('savedSavedCount').textContent=savedSet.size;document.getElementById('savedDaysCount').textContent=getCompanionDays(authState.user);
+}
+
+function toggleProfileMenu(){
+  document.getElementById('profileMenu')?.classList.toggle('open');
+}
+function closeProfileMenu(){
+  document.getElementById('profileMenu')?.classList.remove('open');
+}
+document.addEventListener('click', e=>{
+  const wrap=document.querySelector('.home-profile-wrap');
+  if(wrap && !wrap.contains(e.target)) closeProfileMenu();
+});
+function goHome(){
+  closeSavedPage();
+  closeAuthModal();
+  document.getElementById('results')?.classList.remove('active');
+  document.getElementById('quiz')?.classList.remove('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function scrollToHomeSection(id){
+  closeProfileMenu();
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function showHomeAbout(){
+  closeProfileMenu();
+  alert('MeoMeoFindMovie là website gợi ý phim theo tâm trạng và sở thích của bạn. Dữ liệu phim được cung cấp bởi TMDb.');
+}
+function startFromHeader(){
+  closeProfileMenu();
+  handleStartClick();
+}
+function updateHomeMoodAccess(){
+  const recommend = document.getElementById('homeRecommend');
+  const subtitle = document.querySelector('.home-subtitle');
+  const loggedIn = !!(typeof authState !== 'undefined' && authState.user);
+
+  if(recommend){
+    recommend.textContent = loggedIn
+      ? '✨  Gợi ý phim cho tôi'
+      : '🔐  Đăng nhập để bắt đầu';
+  }
+
+  if(subtitle){
+    subtitle.textContent = loggedIn
+      ? 'Mèo sẽ hỏi bạn vài câu để tìm phim hợp nhất với bạn'
+      : 'Đăng nhập để Mèo tìm phim phù hợp riêng cho bạn';
+  }
+}
+
+
+
+function selectHomeMood(key, btn){
+  // Homepage no longer exposes mood buttons; keep this function for backward compatibility.
+  if(typeof state !== 'undefined') state.mood = key;
+}
+
+async function recommendFromHome(){
+  if(!authState.user){
+    openAuthModal();
+    setAuthMsg('login','Đăng nhập hoặc đăng ký Gmail để bắt đầu chọn phim nhé.','error');
+    return;
+  }
+  startQuiz();
+}
+
+async function renderHomeMoodRecommendations(mood){
+  if(mood) state.mood=mood;
+  if(!state.age) state.age=18;
+  if(!state.time) state.time='vua';
+  await showResults();
+}
+
+function openAllMovies(){
+  startFromHeader();
+}
+function scrollHomeRow(id, dir){
+  const el=document.getElementById(id);
+  if(el) el.scrollBy({left:dir*520,behavior:'smooth'});
+}
+function homeGenreLabel(key){
+  const map={
+    hai:'Hài',chinhkich:'Chính kịch',phimviet:'Việt Nam',scifi:'Sci-Fi',
+    hanhdong:'Hành động',hoathinh:'Hoạt hình',gietgan:'Kinh dị',lamgman:'Lãng mạn'
+  };
+  return map[key]||'Phim';
+}
+const homeMetaCache = {};
+const homeMovieDetailStore = {};
+
+function homeGenreDetailHtml(key){
+  const map={
+    hai:'H&#224;i',
+    chinhkich:'Ch&#237;nh k&#7883;ch',
+    phimviet:'Phim Vi&#7879;t',
+    scifi:'Sci-Fi',
+    hanhdong:'H&#224;nh &#273;&#7897;ng',
+    hoathinh:'Ho&#7841;t h&#236;nh',
+    gietgan:'Gi&#7853;t g&#226;n / Kinh d&#7883;',
+    lamgman:'L&#227;ng m&#7841;n'
+  };
+  return map[key] || escapeHtml(key);
+}
+
+function homeAgeDetailHtml(age){
+  const n=Number(age||0);
+  return n>0 ? `${n}+` : 'M&#7885;i l&#7913;a tu&#7893;i';
+}
+
+function homeMovieReasonText(m){
+  const reasons=m.reasons||{};
+  const preferredMood=(typeof state!=='undefined' && state.mood) ? state.mood : '';
+  const ordered=[];
+  if(preferredMood && reasons[preferredMood]) ordered.push(reasons[preferredMood]);
+  Object.keys(reasons).forEach(key=>{
+    if(key!==preferredMood && reasons[key]) ordered.push(reasons[key]);
+  });
+  return ordered.slice(0,2).join(' ');
+}
+
+function findHomeMovieByKey(key){
+  if(homeMovieDetailStore[key]) return homeMovieDetailStore[key];
+  const source = typeof ALL_MOVIES !== 'undefined' ? ALL_MOVIES : MOVIES;
+  return source.find(m=>movieWatchKey(m)===key);
+}
+
+function openHomeMovieDetail(key){
+  const m=findHomeMovieByKey(key);
+  const modal=document.getElementById('homeMovieDetail');
+  if(!m || !modal) return;
+
+  const meta=homeMetaCache[m.t]||{};
+  const poster=meta.poster ? `https://image.tmdb.org/t/p/w500${meta.poster}` : '';
+  const genres=(m.genres||[]).map(homeGenreDetailHtml).join(', ') || 'Phim';
+  const reason=homeMovieReasonText(m);
+
+  document.getElementById('homeDetailTitle').textContent=m.t||'Phim';
+  document.getElementById('homeDetailGenres').innerHTML=genres;
+  document.getElementById('homeDetailAge').innerHTML=homeAgeDetailHtml(m.age);
+  document.getElementById('homeDetailYear').textContent=Number(m.y)||'';
+  document.getElementById('homeDetailBlurb').textContent=m.blurb||'';
+  document.getElementById('homeDetailReason').innerHTML=reason
+    ? escapeHtml(reason)
+    : 'Phim n&#224;y h&#7907;p gu v&#224; &#273;&#225;ng &#273;&#7875; th&#7917; khi b&#7841;n mu&#7889;n &#273;&#7893;i kh&#244;ng kh&#237;.';
+  document.getElementById('homeDetailPosterSlot').innerHTML=poster
+    ? `<img class="home-detail-poster" src="${escapeAttr(poster)}" alt="${escapeAttr(m.t)}">`
+    : `<div class="home-detail-poster home-detail-poster-fallback">${escapeHtml(m.t||'Phim')}</div>`;
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+
+function closeHomeMovieDetail(event){
+  if(event && event.currentTarget !== event.target) return;
+  const modal=document.getElementById('homeMovieDetail');
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+
+function handleHomeMovieCardKey(event,key){
+  if(event.key==='Enter' || event.key===' '){
+    event.preventDefault();
+    openHomeMovieDetail(key);
+  }
+}
+
+document.addEventListener('keydown', event=>{
+  if(event.key==='Escape') closeHomeMovieDetail();
+});
+
+function homeMovieCard(m, meta){
+  const poster=meta?.poster ? `https://image.tmdb.org/t/p/w500${meta.poster}` : '';
+  const rating=meta?.rating ? `★ ${Number(meta.rating).toFixed(1)}` : '';
+  const genres=(m.genres||[]).slice(0,1).map(homeGenreLabel).join('');
+  const key=movieWatchKey(m);
+  homeMovieDetailStore[key]=m;
+  if(meta) homeMetaCache[m.t]=meta;
+  const saved=savedSet.has(key), fav=favoriteSet.has(key);
+  return `<article class="home-movie-card" role="button" tabindex="0" data-movie-key="${escapeAttr(key)}" onclick="openHomeMovieDetail(this.dataset.movieKey)" onkeydown="handleHomeMovieCardKey(event,this.dataset.movieKey)" title="${escapeAttr(m.t)}">
+    ${poster
+      ? `<img class="home-poster" loading="lazy" src="${poster}" alt="${escapeAttr(m.t)}">`
+      : `<div class="home-poster home-poster-fallback">${escapeHtml(m.t)}</div>`}
+    <span class="home-badge${(saved||fav)?' show':''}${fav?' fav':''}" data-badge-key="${escapeAttr(key)}">${fav?'♥ Yêu thích':saved?'✓ Đã lưu':''}</span>
+    <div class="home-card-actions"><button type="button" class="home-save-mini ${saved?'on':''}" data-action-key="${escapeAttr(key)}" data-action-type="saved" aria-label="${saved?'Bỏ lưu':'Lưu phim'}" aria-pressed="${saved}" title="${saved?'Bỏ lưu':'Lưu phim'}" onclick="event.stopPropagation();toggleSavedMovie('${escapeAttr(key)}')">${bookmarkIcon(saved)}</button><button type="button" class="home-save-mini ${fav?'fav':''}" data-action-key="${escapeAttr(key)}" data-action-type="favorite" aria-label="${fav?'Bỏ yêu thích':'Yêu thích'}" aria-pressed="${fav}" title="${fav?'Bỏ yêu thích':'Yêu thích'}" onclick="event.stopPropagation();toggleFavoriteMovie('${escapeAttr(key)}')">${heartIcon(fav)}</button></div>
+    <div class="home-movie-info">
+      <div class="home-movie-title">${escapeHtml(m.t)}</div>
+      <div class="home-movie-meta">${m.y} · ${escapeHtml(genres||'Phim')}</div>
+      ${rating?`<div class="home-movie-rating">${rating}</div>`:''}
+    </div>
+  </article>`;
+}
+async function loadHomeMovies(){
+  if(typeof MOVIES==='undefined') return;
+  // Lọc phim yêu thích: từ 2022 trở lên, rating 4.5+ (chỉnh từ API sau)
+  homePopularMovies = MOVIES.filter(m => m.y >= 2022);
+  homePopularPage = 1;
+  const suggested=MOVIES.slice(8,16);
+  const all=[...homePopularMovies,...suggested];
+  const metas={};
+  const row1=document.getElementById('homePopularRow');
+  const row2=document.getElementById('homeSuggestedRow');
+  renderHomePopularRow();
+  if(row2) row2.innerHTML=suggested.map(m=>homeMovieCard(m,null)).join('');
+  if(typeof TMDB_API_KEY==='undefined') return;
+  await Promise.all(all.map(async m=>{
+    try{
+      const r=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(m.t)}`);
+      const d=await r.json();
+      const hit=(d.results||[]).find(x=>x.poster_path) || d.results?.[0];
+      if(hit){ metas[m.t]={poster:hit.poster_path,rating:hit.vote_average}; homeMetaCache[m.t]=metas[m.t]; }
+    }catch(e){}
+  }));
+  renderHomePopularRow();
+  if(row2) row2.innerHTML=suggested.map(m=>homeMovieCard(m,metas[m.t])).join('');
+  const posters=Object.values(metas).map(x=>x.poster).filter(Boolean).slice(0,10);
+  if(posters.length){
+    const bg=posters.map((p,i)=>`url("https://image.tmdb.org/t/p/w780${p}") ${i%2?'right':'left'} ${Math.floor(i/2)*160}px`).join(',');
+    const backdrop=document.getElementById('homeBackdrop');
+    if(backdrop){
+      backdrop.style.backgroundImage=posters.slice(0,6).map((p,i)=>`url("https://image.tmdb.org/t/p/w780${p}")`).join(',');
+      backdrop.style.backgroundSize=posters.slice(0,6).map(()=> '280px auto').join(',');
+      backdrop.style.backgroundPosition=posters.slice(0,6).map((_,i)=>`${(i%3)*34+2}% ${Math.floor(i/3)*50+8}%`).join(',');
+      backdrop.style.backgroundRepeat=posters.slice(0,6).map(()=> 'no-repeat').join(',');
+      backdrop.style.filter='blur(0px)';
+    }
+  }
+}
+function updateHomeProfile(){
+  const greeting=document.getElementById('homeGreeting');
+  const avatar=document.getElementById('homeAvatar');
+  if(!greeting||!avatar||typeof authState==='undefined') return;
+  if(authState.user){
+    const name=authState.user.split('@')[0];
+    greeting.textContent=name.length>12?name.slice(0,12)+'…':name;
+    avatar.textContent=name.charAt(0).toUpperCase();
+  }else{
+    greeting.textContent='Xin chào!';
+    avatar.textContent='🐱';
+  }
+}
+function homeInit(){
+  updateHomeProfile();
+  updateHomeMoodAccess();
+  loadHomeMovies();
+}
+setTimeout(homeInit,0);
+
+// Khôi phục phiên đăng nhập sau khi tải lại trang, để tài khoản không bị văng ra.
+// Đăng nhập ngay lập tức bằng email đã lưu (không chờ mạng) để cảm giác tức thì,
+// rồi xác thực lại ngầm phía sau — nếu tài khoản không còn hợp lệ mới đăng xuất.
+function restoreSession(){
+  let savedEmail = null;
+  try{ savedEmail = localStorage.getItem('meomeo:session'); }catch(e){ console.warn('[restoreSession] không đọc được localStorage:', e); }
+  console.log('[restoreSession] email đã lưu:', savedEmail);
+  if(!savedEmail) return;
+  loginSuccess(savedEmail);
+  console.log('[restoreSession] đã khôi phục đăng nhập ngay cho', savedEmail);
+  verifySessionInBackground(savedEmail);
+}
+async function verifySessionInBackground(savedEmail){
+  try{
+    const record = await getUserRecord(savedEmail);
+    console.log('[restoreSession] xác thực ngầm:', record);
+    if(!record || record.banned){
+      try{ localStorage.removeItem('meomeo:session'); }catch(e){}
+      if(authState.user === savedEmail) logout();
+      if(record && record.banned) alert('Tài khoản của bạn đã bị khóa.');
+      console.log('[restoreSession] tài khoản không hợp lệ hoặc bị khóa, đã đăng xuất.');
+    }
+  }catch(e){
+    console.warn('[restoreSession] lỗi khi xác thực ngầm:', e);
+  }
+}
+restoreSession();
+
 </script>
 <!-- ================= HỎI ADMIN — CHAT WIDGET ================= -->
 <button id="adminChatBtn" onclick="toggleChatPanel()" aria-label="Hỏi Admin">
@@ -3169,5 +4473,316 @@ checkAdminSecretHash();
   </div>
 </div>
 
+<!-- ================= MODAL KHẢO SÁT TÌM PHIM ================= -->
+<div class="movie-survey-overlay" id="movieSurveyOverlay">
+  <div class="movie-survey-modal">
+    <button class="close-btn" onclick="closeSurvey()">✕</button>
+    
+    <div class="survey-header">
+      <h2>🎬 Tìm phim phù hợp với bạn</h2>
+      <p>Trả lời 5 câu hỏi để nhận gợi ý phim tuyệt vời</p>
+    </div>
+
+    <form id="movieSurveyForm">
+      <!-- 1. Cảm xúc (chọn nhiều) -->
+      <div class="survey-section">
+        <div class="survey-section-title">😊 1. Bạn đang ở trạng thái cảm xúc nào?</div>
+        <div class="survey-options">
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="emotions" value="vui">
+            <span class="survey-option-icon">😄</span>
+            <span class="survey-option-text">Vui vẻ</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="emotions" value="buon">
+            <span class="survey-option-icon">😢</span>
+            <span class="survey-option-text">Buồn</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="emotions" value="hoihop">
+            <span class="survey-option-icon">😲</span>
+            <span class="survey-option-text">Hồi hộp</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="emotions" value="can_cuong">
+            <span class="survey-option-icon">😤</span>
+            <span class="survey-option-text">Căng thẳng</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="emotions" value="yeu_thich">
+            <span class="survey-option-icon">❤️</span>
+            <span class="survey-option-text">Yêu thích</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 2. Sở thích thể loại (chọn nhiều) -->
+      <div class="survey-section">
+        <div class="survey-section-title">🎭 2. Bạn thích thể loại phim nào?</div>
+        <div class="survey-options">
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="genres" value="hai">
+            <span class="survey-option-icon">😂</span>
+            <span class="survey-option-text">Hài hước</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="genres" value="hanhdong">
+            <span class="survey-option-icon">💥</span>
+            <span class="survey-option-text">Hành động</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="genres" value="chinhkich">
+            <span class="survey-option-icon">🎪</span>
+            <span class="survey-option-text">Chính kịch</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="genres" value="gietgan">
+            <span class="survey-option-icon">🔪</span>
+            <span class="survey-option-text">Giật gân</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="genres" value="lamgman">
+            <span class="survey-option-icon">💕</span>
+            <span class="survey-option-text">Lãng mạn</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="genres" value="scifi">
+            <span class="survey-option-icon">🚀</span>
+            <span class="survey-option-text">Khoa học viễn tưởng</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. Độ tuổi (chỉ chọn 1) -->
+      <div class="survey-section survey-section-age">
+        <div class="survey-section-title">🔞 3. Phim phù hợp cho độ tuổi nào?</div>
+        <div class="survey-options">
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="age" value="0">
+            <span class="survey-option-text">Tất cả lứa tuổi</span>
+          </label>
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="age" value="13">
+            <span class="survey-option-text">13+</span>
+          </label>
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="age" value="16">
+            <span class="survey-option-text">16+</span>
+          </label>
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="age" value="18">
+            <span class="survey-option-text">18+</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 4. Cảm xúc sau khi xem (chọn nhiều) -->
+      <div class="survey-section">
+        <div class="survey-section-title">🌟 4. Sau khi xem phim, bạn muốn cảm thấy như thế nào?</div>
+        <div class="survey-options">
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="after_mood" value="chualanh">
+            <span class="survey-option-icon">🫂</span>
+            <span class="survey-option-text">Ấm lòng</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="after_mood" value="trongrong">
+            <span class="survey-option-icon">⚡</span>
+            <span class="survey-option-text">Truyền cảm hứng</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="after_mood" value="suyngam">
+            <span class="survey-option-icon">🤔</span>
+            <span class="survey-option-text">Suy ngẫm</span>
+          </label>
+          <label class="survey-option">
+            <input type="checkbox" class="survey-checkbox" name="after_mood" value="hoainiem">
+            <span class="survey-option-icon">🍂</span>
+            <span class="survey-option-text">Hoài niệm</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 5. Độ dài phim (chỉ chọn 1, 3 lựa chọn) -->
+      <div class="survey-section survey-section-duration">
+        <div class="survey-section-title">⏱️ 5. Bạn muốn xem phim dài bao lâu?</div>
+        <div class="survey-options">
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="duration" value="short">
+            <span class="survey-option-icon">⏱️</span>
+            <span class="survey-option-text">Dưới 100 phút</span>
+          </label>
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="duration" value="long">
+            <span class="survey-option-icon">🎬</span>
+            <span class="survey-option-text">Trên 100 phút</span>
+          </label>
+          <label class="survey-option">
+            <input type="radio" class="survey-radio" name="duration" value="series">
+            <span class="survey-option-icon">📺</span>
+            <span class="survey-option-text">Cày theo tập (Series)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="survey-actions">
+        <button type="submit" class="survey-btn survey-btn-primary">🎯 Tìm phim cho tôi</button>
+        <button type="reset" class="survey-btn survey-btn-secondary" onclick="resetSurvey()">↺ Làm lại</button>
+      </div>
+
+      <div class="survey-note">✨ Hãy chọn các tùy chọn mà bạn thích, nó sẽ giúp chúng tôi gợi ý phim tốt hơn!</div>
+    </form>
+  </div>
+</div>
+
+<!-- JavaScript cho khảo sát -->
+<script>
+// Hàm mở khảo sát
+function openSurvey() {
+  const overlay = document.getElementById('movieSurveyOverlay');
+  if (overlay) {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+// Hàm đóng khảo sát
+function closeSurvey() {
+  const overlay = document.getElementById('movieSurveyOverlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+// Hàm làm lại khảo sát
+function resetSurvey() {
+  document.getElementById('movieSurveyForm').reset();
+  updateSurveyOptions();
+}
+
+// Cập nhật hiệu ứng khi click vào các option
+document.addEventListener('DOMContentLoaded', function() {
+  const surveyForm = document.getElementById('movieSurveyForm');
+  
+  if (surveyForm) {
+    // Xử lý click cho checkbox (emotions, genres, after_mood)
+    document.querySelectorAll('.survey-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const label = this.closest('.survey-option');
+        if (this.checked) {
+          label.classList.add('selected');
+        } else {
+          label.classList.remove('selected');
+        }
+      });
+    });
+
+    // Xử lý click cho radio (age, duration)
+    document.querySelectorAll('.survey-radio').forEach(radio => {
+      radio.addEventListener('change', function() {
+        // Xóa selected từ tất cả các option cùng group
+        const name = this.name;
+        document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+          r.closest('.survey-option').classList.remove('selected');
+        });
+        // Thêm selected cho option được chọn
+        this.closest('.survey-option').classList.add('selected');
+      });
+    });
+
+    // Xử lý submit form
+    surveyForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Lấy dữ liệu
+      const emotions = Array.from(document.querySelectorAll('input[name="emotions"]:checked')).map(el => el.value);
+      const genres = Array.from(document.querySelectorAll('input[name="genres"]:checked')).map(el => el.value);
+      const age = document.querySelector('input[name="age"]:checked')?.value || '';
+      const afterMood = Array.from(document.querySelectorAll('input[name="after_mood"]:checked')).map(el => el.value);
+      const duration = document.querySelector('input[name="duration"]:checked')?.value || '';
+
+      // Kiểm tra điều kiện
+      if (emotions.length === 0) {
+        alert('⚠️ Vui lòng chọn ít nhất một cảm xúc hiện tại');
+        return;
+      }
+      if (genres.length === 0) {
+        alert('⚠️ Vui lòng chọn ít nhất một thể loại phim');
+        return;
+      }
+      if (!age) {
+        alert('⚠️ Vui lòng chọn độ tuổi phù hợp');
+        return;
+      }
+      if (afterMood.length === 0) {
+        alert('⚠️ Vui lòng chọn ít nhất một cảm xúc mong muốn sau khi xem');
+        return;
+      }
+      if (!duration) {
+        alert('⚠️ Vui lòng chọn độ dài phim mong muốn');
+        return;
+      }
+
+      // Dữ liệu khảo sát
+      const surveyData = {
+        emotions: emotions,
+        genres: genres,
+        age: Number(age),
+        after_mood: afterMood,
+        duration: duration,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📋 Dữ liệu khảo sát:', surveyData);
+
+      // Hiển thị thông báo thành công
+      alert('✅ Cảm ơn bạn! Chúng tôi đang tìm phim phù hợp...\n\nEmotions: ' + emotions.join(', ') + 
+            '\nGenres: ' + genres.join(', ') + 
+            '\nAge: ' + age + '+' +
+            '\nAfter mood: ' + afterMood.join(', ') +
+            '\nDuration: ' + duration);
+
+      // Có thể thêm code gửi dữ liệu lên server ở đây
+      // fetch('/api/survey', { method: 'POST', body: JSON.stringify(surveyData) })
+
+      // Đóng modal sau 1 giây
+      setTimeout(() => {
+        closeSurvey();
+        resetSurvey();
+      }, 500);
+    });
+  }
+});
+
+// Hàm cập nhật UI options (nếu cần)
+function updateSurveyOptions() {
+  document.querySelectorAll('.survey-option.selected').forEach(el => {
+    el.classList.remove('selected');
+  });
+}
+
+// Đóng khảo sát khi click vào backdrop
+document.addEventListener('DOMContentLoaded', function() {
+  const overlay = document.getElementById('movieSurveyOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeSurvey();
+      }
+    });
+  }
+});
+
+// Đóng khảo sát khi nhấn Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeSurvey();
+  }
+});
+</script>
+
 </body>
 </html>
+
