@@ -1314,7 +1314,7 @@ body{
           <span class="home-chevron">⌄</span>
         </button>
         <div class="profile-menu" id="profileMenu">
-          <button type="button" onclick="openAuthModal()">Rời bỏ Meomeo</button>
+          <button type="button" onclick="openAuthModal()">Nhận nuôi/Rời bỏ Meomeo</button>
           <button type="button" onclick="startFromHeader()">Bắt đầu chọn phim</button>
         </div>
       </div>
@@ -1486,8 +1486,14 @@ body{
 
         <div class="auth-form" id="formOtp">
           <button type="button" class="auth-back-link" onclick="cancelOtpFlow()">← Quay lại đăng ký</button>
-          <div class="auth-field"><label for="otpInput">Mã xác minh</label><div class="auth-input-wrap"><span>✦</span><input type="text" id="otpInput" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="letter-spacing:7px;text-align:center" onkeydown="if(event.key==='Enter') verifyOtpAndFinishRegister()"></div></div>
-          <button type="button" class="auth-submit auth-gradient" onclick="verifyOtpAndFinishRegister()">Xác nhận</button>
+          <div class="auth-title-row">
+            <div>
+              <h2>Xác minh email</h2>
+              <p>Mã OTP tạo tài khoản đã được gửi tới <b id="otpTargetEmail"></b>.</p>
+            </div>
+          </div>
+          <div class="auth-field"><label for="otpInput">Nhập mã OTP 6 số</label><div class="auth-input-wrap"><span>✦</span><input type="text" id="otpInput" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="000000" autocomplete="one-time-code" style="letter-spacing:7px;text-align:center" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)" onkeydown="if(event.key==='Enter') verifyOtpAndFinishRegister()"></div></div>
+          <button type="button" class="auth-submit auth-gradient" onclick="verifyOtpAndFinishRegister()">Xác nhận mã & tạo tài khoản</button>
           <div class="auth-reset-actions"><button type="button" onclick="resendOtp()">Gửi lại mã</button><button type="button" onclick="cancelOtpFlow()">Hủy, quay lại</button></div>
           <p class="auth-msg" id="msgOtp"></p>
         </div>
@@ -2412,7 +2418,13 @@ function otpErrorMessage(error, waitSec){
 async function sendRegistrationOtp(email, password, name, legalConsent){
   try{
     const { expiresAt } = await requestOtp(email, 'register');
-    pendingRegistration = { email, password, name: name || pendingRegistration?.name || '', expiresAt };
+    pendingRegistration = {
+      email,
+      password,
+      name: name || pendingRegistration?.name || '',
+      expiresAt,
+      legalConsent: legalConsent || pendingRegistration?.legalConsent || null
+    };
     document.getElementById('otpTargetEmail').textContent = email;
     document.getElementById('otpInput').value = '';
     document.getElementById('msgOtp').textContent = '';
@@ -2438,11 +2450,18 @@ async function resendOtp(){
     return;
   }
   document.getElementById('msgOtp').textContent = 'Đang gửi lại mã...';
-  await sendRegistrationOtp(pendingRegistration.email, pendingRegistration.password, pendingRegistration.name);
+  await sendRegistrationOtp(
+    pendingRegistration.email,
+    pendingRegistration.password,
+    pendingRegistration.name,
+    pendingRegistration.legalConsent
+  );
 }
 
 function cancelOtpFlow(){
   pendingRegistration = null;
+  const otpInput = document.getElementById('otpInput');
+  if(otpInput) otpInput.value = '';
   document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('active'));
   document.getElementById('formRegister').classList.add('active');
 }
@@ -2489,6 +2508,7 @@ async function verifyOtpAndFinishRegister(){
     displayName: pendingRegistration.name || '',
     password: await hashPassword(password, email),
     registeredAt: Date.now(),
+    emailVerifiedAt: Date.now(),
     banned: false,
     legalConsent: pendingRegistration.legalConsent || null,
   });
