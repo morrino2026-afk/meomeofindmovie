@@ -2200,14 +2200,26 @@ function firebaseUserKey(email){
   return email.trim().toLowerCase().replace(/[.#$\[\]]/g, '_');
 }
 
+// QUAN TRỌNG: khi Firebase đã sẵn sàng (firebaseReady = true), Firebase là nguồn dữ liệu
+// DUY NHẤT đáng tin cậy cho tài khoản (vì tài khoản cần dùng chung được trên mọi thiết bị/
+// trình duyệt/nền tảng). Nếu đọc Firebase bị lỗi (mất mạng, đổi mạng khi chuyển thiết bị/nền
+// tảng...), TUYỆT ĐỐI không được âm thầm coi là "tài khoản không tồn tại" rồi rơi về
+// localStorage của riêng máy đó — vì máy/nền tảng khác sẽ luôn trống, khiến người dùng bị
+// văng ra và buộc phải tạo tài khoản lại dù tài khoản vẫn còn trên Firebase (đây chính là bug
+// "login xong đổi nền tảng khác thì mất dữ liệu login, bị bắt tạo tài khoản"). Thay vào đó,
+// ta ném lỗi rõ ràng (isConnectionError) để nơi gọi hiển thị "lỗi kết nối, thử lại" thay vì
+// "chưa đăng ký" / tự động đăng xuất.
 async function getUserRecord(email){
   if(typeof firebaseReady !== 'undefined' && firebaseReady){
     try{
       const snap = await fbDb.ref('users/' + firebaseUserKey(email)).once('value');
-      const val = snap.val();
-      if(val) return val;
-      return null;
-    }catch(e){ console.warn('Firebase getUserRecord lỗi, dùng lưu trữ cục bộ:', e); }
+      return snap.val() || null;
+    }catch(e){
+      console.warn('Firebase getUserRecord lỗi (lỗi kết nối, không phải "không tồn tại"):', e);
+      const err = new Error('connection-error');
+      err.isConnectionError = true;
+      throw err;
+    }
   }
   const key = 'user:' + email.trim().toLowerCase();
   try{
@@ -2224,7 +2236,12 @@ async function saveUserRecord(email, record){
     try{
       await fbDb.ref('users/' + firebaseUserKey(email)).set(record);
       return;
-    }catch(e){ console.warn('Firebase saveUserRecord lỗi, dùng lưu trữ cục bộ:', e); }
+    }catch(e){
+      console.warn('Firebase saveUserRecord lỗi (lỗi kết nối):', e);
+      const err = new Error('connection-error');
+      err.isConnectionError = true;
+      throw err;
+    }
   }
   const key = 'user:' + email.trim().toLowerCase();
   try{
@@ -2293,7 +2310,13 @@ async function handleLogin(){
     return;
   }
   setAuthMsg('login', 'Đang kiểm tra...', '');
-  const record = await getUserRecord(email);
+  let record;
+  try{
+    record = await getUserRecord(email);
+  }catch(e){
+    setAuthMsg('login', 'Không thể kết nối máy chủ để kiểm tra tài khoản. Vui lòng kiểm tra mạng và thử lại (không phải do tài khoản chưa đăng ký).', 'error');
+    return;
+  }
   if(!record){
     setAuthMsg('login', 'Email này chưa đăng ký. Chuyển sang tab "Đăng ký" để tạo tài khoản trước nhé.', 'error');
     return;
@@ -2345,7 +2368,13 @@ async function handleRegister(){
     return;
   }
   setAuthMsg('register', 'Đang gửi mã xác minh...', '');
-  const record = await getUserRecord(email);
+  let record;
+  try{
+    record = await getUserRecord(email);
+  }catch(e){
+    setAuthMsg('register', 'Không thể kết nối máy chủ để kiểm tra email. Vui lòng kiểm tra mạng và thử lại.', 'error');
+    return;
+  }
   if(record){
     setAuthMsg('register', 'Email này đã được đăng ký rồi. Hãy chuyển sang tab "Đăng nhập" thay vì đăng ký lại.', 'error');
     return;
@@ -2503,15 +2532,21 @@ async function verifyOtpAndFinishRegister(){
   }
 
   const { email, password } = pendingRegistration;
-  await saveUserRecord(email, {
-    email: email.trim(),
-    displayName: pendingRegistration.name || '',
-    password: await hashPassword(password, email),
-    registeredAt: Date.now(),
-    emailVerifiedAt: Date.now(),
-    banned: false,
-    legalConsent: pendingRegistration.legalConsent || null,
-  });
+  try{
+    await saveUserRecord(email, {
+      email: email.trim(),
+      displayName: pendingRegistration.name || '',
+      password: await hashPassword(password, email),
+      registeredAt: Date.now(),
+      emailVerifiedAt: Date.now(),
+      banned: false,
+      legalConsent: pendingRegistration.legalConsent || null,
+    });
+  }catch(e){
+    msgEl.textContent = 'Không thể kết nối máy chủ để lưu tài khoản. Vui lòng thử lại (mã xác minh vẫn còn hiệu lực).';
+    msgEl.className = 'auth-msg error';
+    return;
+  }
   pendingRegistration = null;
   setAuthMsg('register', 'Xác minh thành công, đăng ký hoàn tất!', 'success');
   loginSuccess(email);
@@ -2537,7 +2572,14 @@ async function sendForgotPasswordOtp(){
   }
   msgEl.textContent = 'Đang kiểm tra...';
   msgEl.className = 'auth-msg';
-  const record = await getUserRecord(email);
+  let record;
+  try{
+    record = await getUserRecord(email);
+  }catch(e){
+    msgEl.textContent = 'Không thể kết nối máy chủ. Vui lòng kiểm tra mạng và thử lại.';
+    msgEl.className = 'auth-msg error';
+    return;
+  }
   if(!record){
     msgEl.textContent = 'Email này chưa đăng ký tài khoản nào.';
     msgEl.className = 'auth-msg error';
@@ -2622,14 +2664,27 @@ async function submitNewPasswordFromOtp(){
   }
 
   const { email } = pendingPasswordReset;
-  const record = await getUserRecord(email);
+  let record;
+  try{
+    record = await getUserRecord(email);
+  }catch(e){
+    msgEl.textContent = 'Không thể kết nối máy chủ. Vui lòng kiểm tra mạng và thử lại.';
+    msgEl.className = 'auth-msg error';
+    return;
+  }
   if(!record){
     msgEl.textContent = 'Tài khoản không còn tồn tại.';
     msgEl.className = 'auth-msg error';
     return;
   }
   record.password = await hashPassword(newPassword, email);
-  await saveUserRecord(email, record);
+  try{
+    await saveUserRecord(email, record);
+  }catch(e){
+    msgEl.textContent = 'Không thể kết nối máy chủ để lưu mật khẩu mới. Vui lòng thử lại.';
+    msgEl.className = 'auth-msg error';
+    return;
+  }
   pendingPasswordReset = null;
 
   switchAuthTab('login');
@@ -4386,17 +4441,25 @@ function restoreSession(){
   verifySessionInBackground(savedEmail);
 }
 async function verifySessionInBackground(savedEmail){
+  let record;
   try{
-    const record = await getUserRecord(savedEmail);
-    console.log('[restoreSession] xác thực ngầm:', record);
-    if(!record || record.banned){
-      try{ localStorage.removeItem('meomeo:session'); }catch(e){}
-      if(authState.user === savedEmail) logout();
-      if(record && record.banned) alert('Tài khoản của bạn đã bị khóa.');
-      console.log('[restoreSession] tài khoản không hợp lệ hoặc bị khóa, đã đăng xuất.');
-    }
+    record = await getUserRecord(savedEmail);
   }catch(e){
-    console.warn('[restoreSession] lỗi khi xác thực ngầm:', e);
+    // Lỗi kết nối (vd: vừa đổi mạng/thiết bị/nền tảng) — KHÔNG được coi là tài khoản không
+    // tồn tại. Giữ nguyên phiên đăng nhập hiện tại, không đăng xuất, không xóa session đã lưu.
+    // Đây chính là chỗ trước đây gây ra bug "đổi nền tảng khác thì mất đăng nhập, bị bắt tạo
+    // tài khoản lại" — vì lỗi mạng từng bị hiểu nhầm thành "record không tồn tại".
+    console.warn('[restoreSession] lỗi kết nối khi xác thực ngầm, giữ nguyên phiên đăng nhập:', e);
+    return;
+  }
+  console.log('[restoreSession] xác thực ngầm:', record);
+  // Chỉ đăng xuất khi Firebase đã trả lời THÀNH CÔNG và xác nhận chắc chắn tài khoản
+  // không còn tồn tại hoặc đã bị khóa.
+  if(!record || record.banned){
+    try{ localStorage.removeItem('meomeo:session'); }catch(e){}
+    if(authState.user === savedEmail) logout();
+    if(record && record.banned) alert('Tài khoản của bạn đã bị khóa.');
+    console.log('[restoreSession] tài khoản không hợp lệ hoặc bị khóa, đã đăng xuất.');
   }
 }
 restoreSession();
