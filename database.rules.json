@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "movies": {
+      ".read": true,
+      ".write": "auth != null && auth.uid === 'LXu92sCOJff6XAzRcWlTy2Chyqq2'"
+    },
+    "users": {
+      ".read": "auth != null && auth.uid === 'LXu92sCOJff6XAzRcWlTy2Chyqq2'",
+      ".write": "auth != null && auth.uid === 'LXu92sCOJff6XAzRcWlTy2Chyqq2'"
+    },
+    "chats": {
+      ".read": "auth != null && auth.uid === 'LXu92sCOJff6XAzRcWlTy2Chyqq2'",
+      ".write": "auth != null && auth.uid === 'LXu92sCOJff6XAzRcWlTy2Chyqq2'"
+    }
+  }
+}

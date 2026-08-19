@@ -21,7 +21,8 @@ const crypto = require('crypto');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 // Nếu chạy sau reverse proxy (Render, Railway, Vercel...), cần bật trust proxy
 // để req.ip lấy đúng IP thật của người dùng thay vì IP của proxy nội bộ.
@@ -36,6 +37,41 @@ app.use(express.json());
 
 // Phục vụ toàn bộ file tĩnh (index.html, ảnh, v.v.) trong thư mục public/
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/api/tmdb/search/:type', async (req, res) => {
+  const type = req.params.type;
+  if (!TMDB_API_KEY || !['movie', 'multi'].includes(type)) {
+    return res.status(503).json({ error: 'tmdb_not_configured' });
+  }
+  const query = typeof req.query.query === 'string' ? req.query.query.trim() : '';
+  if (!query || query.length > 120) return res.status(400).json({ error: 'invalid_query' });
+  const language = req.query.language === 'en-US' ? 'en-US' : 'vi-VN';
+  try {
+    const tmdbRes = await fetch(`https://api.themoviedb.org/3/search/${type}?api_key=${encodeURIComponent(TMDB_API_KEY)}&language=${language}&query=${encodeURIComponent(query)}`);
+    const body = await tmdbRes.text();
+    res.status(tmdbRes.status).type('application/json').send(body);
+  } catch (err) {
+    console.error('Lỗi proxy TMDb:', err);
+    res.status(502).json({ error: 'tmdb_unavailable' });
+  }
+});
+
+app.get('/api/tmdb/:type/:id', async (req, res) => {
+  const type = req.params.type;
+  const id = req.params.id;
+  if (!TMDB_API_KEY || !['movie', 'tv'].includes(type) || !/^\d+$/.test(id)) {
+    return res.status(400).json({ error: 'invalid_tmdb_request' });
+  }
+  const language = req.query.language === 'en-US' ? 'en-US' : 'vi-VN';
+  try {
+    const tmdbRes = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${encodeURIComponent(TMDB_API_KEY)}&language=${language}`);
+    const body = await tmdbRes.text();
+    res.status(tmdbRes.status).type('application/json').send(body);
+  } catch (err) {
+    console.error('Lỗi proxy TMDb:', err);
+    res.status(502).json({ error: 'tmdb_unavailable' });
+  }
+});
 
 // ---------------------------------------------------------------
 // Cấu hình gửi mail qua SMTP (Nodemailer) — dùng biến môi trường,
@@ -350,6 +386,17 @@ app.post('/api/otp/verify', (req, res) => {
   // --- LỚP 4: cấp verifyToken ngắn hạn, dùng 1 lần, cho bước tiếp theo ---
   const verifyToken = issueVerifyToken(email, purpose);
   res.json({ ok: true, verifyToken, verifyTokenExpiresInSec: VERIFY_TOKEN_TTL_MS / 1000 });
+});
+
+app.post('/api/otp/consume', (req, res) => {
+  const { email, purpose, verifyToken } = req.body || {};
+  if (!isValidGmail(email) || (purpose !== 'register' && purpose !== 'reset')) {
+    return res.status(400).json({ error: 'invalid_request' });
+  }
+  if (!verifyVerifyToken(verifyToken, email, purpose)) {
+    return res.status(401).json({ error: 'invalid_verify_token' });
+  }
+  res.json({ ok: true });
 });
 
 // Kiểm tra nhanh service còn sống (Render health check có thể dùng route này).
