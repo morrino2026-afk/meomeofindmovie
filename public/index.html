@@ -1316,7 +1316,7 @@ body{
 </style>
 
 </head>
-<body>
+  <body>
 
 <section class="marquee">
   <div class="bulbs">
@@ -1338,8 +1338,6 @@ body{
   <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
 </div>
 
-
-<!-- ================= NEW HOME UI ================= -->
 <section class="home-app" id="homeApp">
   <div class="home-backdrop" id="homeBackdrop"></div>
 
@@ -2438,7 +2436,7 @@ async function handleRegister(){
    Toàn bộ việc tạo mã, lưu mã và kiểm tra mã OTP giờ nằm ở BACKEND (server.js), không còn
    nằm trong biến JS ở trình duyệt nữa — tránh việc ai đó mở Console (F12) đọc thẳng mã OTP.
    Frontend chỉ gọi 2 API: /api/otp/request (xin gửi mã) và /api/otp/verify (xác minh mã). */
-const API_BASE = ''; // cùng domain với Render nên để rỗng; nếu tách domain khác, đổi thành URL đầy đủ, vd 'https://ten-app.onrender.com'
+const API_BASE = 'https://meomeofindmovie.vercel.app';
 
 // Lưu tạm thông tin đăng ký đang chờ xác minh — chỉ tồn tại trong phiên trình duyệt hiện tại.
 // Lưu ý: KHÔNG còn chứa "otp" ở đây nữa, mã OTP thật chỉ backend biết.
@@ -3142,7 +3140,7 @@ async function renderHomeSuggestedRow(){
     await Promise.all(matches.map(async m=>{
       if(homeMetaCache[m.t]) return;
       try{
-        const r=await fetch(`/api/tmdb/search/movie?language=vi-VN&query=${encodeURIComponent(m.t)}`);
+        const r=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(m.t)}`);
         const d=await r.json();
         const hit=(d.results||[]).find(x=>x.poster_path)||d.results?.[0];
         if(hit) homeMetaCache[m.t]={poster:hit.poster_path,rating:hit.vote_average};
@@ -3328,7 +3326,7 @@ async function hashText(str){
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 const ADMIN_SECRET_HASH = '#web-viet-nguoi-viet';
-const TMDB_API_KEY = null;
+const TMDB_API_KEY = '6f31029a03bfa8cd6f4b7d5c5f61a407';
 
 function checkAdminSecretHash(){
   if(window.location.hash === ADMIN_SECRET_HASH){
@@ -3763,7 +3761,7 @@ async function searchTmdb(){
   if(!q){ resultsEl.innerHTML = ''; return; }
   resultsEl.innerHTML = '<div style="color:var(--slate); font-size:12.5px;">Đang tìm...</div>';
   try{
-    const res = await fetch(`/api/tmdb/search/multi?language=vi-VN&query=${encodeURIComponent(q)}`);
+    const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(q)}`);
     const data = await res.json();
     const rawItems = (data.results || []).filter(r => r.media_type === 'movie' || r.media_type === 'tv').slice(0, 20);
     if(rawItems.length === 0){
@@ -3820,8 +3818,8 @@ async function selectTmdbResult(id, mediaType){
     const endpoint = mediaType === 'tv' ? 'tv' : 'movie';
     // Ưu tiên lấy mô tả tiếng Việt, nếu trống thì lấy bản tiếng Anh.
     const [resVi, resEn] = await Promise.all([
-      fetch(`/api/tmdb/${endpoint}/${encodeURIComponent(id)}?language=vi-VN`).then(r=>r.json()),
-      fetch(`/api/tmdb/${endpoint}/${encodeURIComponent(id)}?language=en-US`).then(r=>r.json())
+      fetch(`https://api.themoviedb.org/3/${endpoint}/${encodeURIComponent(id)}?api_key=${TMDB_API_KEY}&language=vi-VN`).then(r=>r.json()),
+      fetch(`https://api.themoviedb.org/3/${endpoint}/${encodeURIComponent(id)}?api_key=${TMDB_API_KEY}&language=en-US`).then(r=>r.json())
     ]);
     const d = (resVi.overview && resVi.overview.trim()) ? resVi : resEn;
 
@@ -4163,7 +4161,7 @@ async function renderSavedPage(loadMore=false){
   const list=savedFilteredMovies(); const visible=list.slice(0,savedVisible);
   if(!list.length){grid.className='saved-grid';grid.innerHTML='<div class="saved-empty"><div><strong>Chưa có phim trong mục này 🐱</strong><span>Hãy bấm ♡ hoặc nút lưu trên phim để thêm vào danh sách.</span></div></div>';document.getElementById('savedMoreBtn').style.display='none';return}
   grid.className='saved-grid'+(savedView==='list'?' saved-list-view':''); grid.innerHTML=visible.map(savedCard).join('');document.getElementById('savedMoreBtn').style.display=visible.length<list.length?'block':'none';
-  await Promise.all(visible.filter(m=>!savedMetaCache[m.t]).map(async m=>{try{const r=await fetch(`/api/tmdb/search/movie?language=vi-VN&query=${encodeURIComponent(m.t)}`);const d=await r.json();const hit=(d.results||[]).find(x=>x.poster_path)||d.results?.[0];if(hit)savedMetaCache[m.t]={poster:hit.poster_path,rating:hit.vote_average};}catch(e){}}));
+  await Promise.all(visible.filter(m=>!savedMetaCache[m.t]).map(async m=>{try{const r=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(m.t)}`);const d=await r.json();const hit=(d.results||[]).find(x=>x.poster_path)||d.results?.[0];if(hit)savedMetaCache[m.t]={poster:hit.poster_path,rating:hit.vote_average};}catch(e){}}));
   grid.innerHTML=visible.map(savedCard).join('');
   document.getElementById('savedFavoriteCount').textContent=favoriteSet.size;document.getElementById('savedSavedCount').textContent=savedSet.size;document.getElementById('savedDaysCount').textContent=getCompanionDays(authState.user);
 }
@@ -4373,7 +4371,7 @@ async function loadHomeMovies(){
   if(row2) row2.innerHTML=suggested.map(m=>homeMovieCard(m,null)).join('');
   await Promise.all(all.map(async m=>{
     try{
-      const r=await fetch(`/api/tmdb/search/movie?language=vi-VN&query=${encodeURIComponent(m.t)}`);
+      const r=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=vi-VN&query=${encodeURIComponent(m.t)}`);
       const d=await r.json();
       const hit=(d.results||[]).find(x=>x.poster_path) || d.results?.[0];
       if(hit){ metas[m.t]={poster:hit.poster_path,rating:hit.vote_average}; homeMetaCache[m.t]=metas[m.t]; }
