@@ -332,7 +332,9 @@ app.post('/api/otp/request', async (req, res) => {
 
     res.json({ ok: true, expiresAt, cooldownSec: RESEND_COOLDOWN_MS / 1000 });
   } catch (err) {
-    console.error('Lỗi /api/otp/request:', err);
+    console.error('Lỗi /api/otp/request:', err && err.message ? err.message : err);
+    if (err && err.code) console.error('Mã lỗi SMTP:', err.code);
+    if (err && err.response) console.error('Phản hồi từ SMTP server:', err.response);
     res.status(500).json({ error: 'send_failed' });
   }
 });
