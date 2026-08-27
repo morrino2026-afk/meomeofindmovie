@@ -409,6 +409,14 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server đang chạy tại cổng ${PORT}`);
-});
+// Trên Vercel, hàm chạy dưới dạng serverless function nên KHÔNG dùng
+// app.listen() — Vercel tự gọi app như 1 handler. Trên Render (hoặc chạy
+// local), app.listen() vẫn cần để server sống liên tục lắng nghe cổng.
+// Biến VERCEL được Vercel tự set = '1', ta dựa vào đó để phân biệt.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server đang chạy tại cổng ${PORT}`);
+  });
+}
+
+module.exports = app;
