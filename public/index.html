@@ -562,7 +562,7 @@ h1 em{
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
   }
-  .auth-showcase{display:none;}     /* ẩn panel giới thiệu bên trái để dồn chỗ cho form */
+  .auth-showcase{display:none;}     /* ẩn panel Giới bên trái để dồn chỗ cho form */
   .auth-modal-card{
     padding:64px 20px 30px;
     align-items:flex-start;
@@ -1032,7 +1032,49 @@ body{
 @media(max-width:620px){
   .home-header{height:64px;padding:0 14px;gap:10px;}
   .brand-cat{width:39px;height:39px;font-size:20px;border-radius:12px;}
-  .home-nav{display:none;}
+  .home-nav{
+    display:flex;
+    align-items:stretch;
+    justify-content:space-between;
+    gap:2px;
+    flex:1 1 auto;
+    min-width:0;
+    height:100%;
+  }
+  .home-nav a{
+    height:100%;
+    flex:1 1 0;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1px;
+    padding:5px 1px 4px;
+    color:#cfc8d7;
+    font-size:10px;
+    line-height:1.05;
+    white-space:nowrap;
+  }
+  .home-nav .nav-icon{
+    display:block;
+    font-size:18px;
+    line-height:1;
+  }
+  .home-nav .nav-label{
+    display:block;
+    font-size:10px;
+    line-height:1.05;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:100%;
+  }
+  .home-nav a.active::after{
+    left:18%;
+    right:18%;
+    bottom:2px;
+    height:2px;
+  }
   .home-header-actions{gap:8px;}
   .home-profile span:not(.home-avatar):not(.home-chevron){display:none;}
   .home-content{padding:34px 14px 60px;}
@@ -1051,6 +1093,15 @@ body{
   .home-detail-poster{max-width:190px;margin:0 auto;}
   .home-detail-title{margin-right:42px;}
   .home-detail-facts{grid-template-columns:1fr;}
+}
+@media(max-width:380px){
+  .home-header{padding:0 8px;gap:5px;}
+  .home-nav{gap:0;}
+  .home-nav a{padding-left:0;padding-right:0;}
+  .home-nav .nav-icon{font-size:17px;}
+  .home-nav .nav-label{font-size:9.5px;}
+  .home-header-actions{gap:3px;}
+  .home-avatar{width:36px;height:36px;font-size:19px;}
 }
 
 
@@ -1351,9 +1402,18 @@ body{
     </a>
 
     <nav class="home-nav" aria-label="Điều hướng">
-      <a href="#homeApp" class="active" onclick="goHome();return false;">Trang chủ</a>
-      <a href="#savedPage" id="savedNavLink" onclick="openSavedPage();return false;">♡ Đã lưu</a>
-      <a href="https://www.facebook.com/share/1BksAw6oNj/?mibextid=wwXIfr" target="_blank">♧ Giới thiệu</a>
+      <a href="#homeApp" class="active" onclick="goHome();return false;">
+        <span class="nav-icon">⌂</span>
+        <span class="nav-label">Trang chủ</span>
+      </a>
+      <a href="#savedPage" id="savedNavLink" onclick="openSavedPage();return false;">
+        <span class="nav-icon">♡</span>
+        <span class="nav-label">Đã lưu</span>
+      </a>
+      <a href="https://www.facebook.com/share/1BksAw6oNj/?mibextid=wwXIfr" target="_blank">
+        <span class="nav-icon">♧</span>
+        <span class="nav-label">Giới</span>
+      </a>
     </nav>
 
     <div class="home-header-actions">
@@ -2436,7 +2496,8 @@ async function handleRegister(){
    Toàn bộ việc tạo mã, lưu mã và kiểm tra mã OTP giờ nằm ở BACKEND (server.js), không còn
    nằm trong biến JS ở trình duyệt nữa — tránh việc ai đó mở Console (F12) đọc thẳng mã OTP.
    Frontend chỉ gọi 2 API: /api/otp/request (xin gửi mã) và /api/otp/verify (xác minh mã). */
-const API_BASE = 'https://meomeofindmovie.vercel.app';
+// Backend phục vụ cùng origin khi deploy bằng Render hoặc chạy local.
+const API_BASE = '';
 
 // Lưu tạm thông tin đăng ký đang chờ xác minh — chỉ tồn tại trong phiên trình duyệt hiện tại.
 // Lưu ý: KHÔNG còn chứa "otp" ở đây nữa, mã OTP thật chỉ backend biết.
@@ -2458,18 +2519,32 @@ async function requestOtp(email, purpose){
   const data = await res.json().catch(()=>({}));
   if(!res.ok){
     if(data.error === 'cooldown'){
-      throw new Error(`Vui lòng đợi ${data.waitSec || 60} giây rồi thử lại`);
+      const error = new Error(`Vui lòng đợi ${data.waitSec || 60} giây rồi thử lại.`);
+      error.code = 'cooldown';
+      throw error;
     }
     if(data.error === 'ip_rate_limited'){
       const mins = Math.ceil((data.waitSec || 900) / 60);
-      throw new Error(`Bạn đã gửi quá nhiều yêu cầu mã. Vui lòng thử lại sau khoảng ${mins} phút.`);
+      const error = new Error(`Bạn đã gửi quá nhiều yêu cầu mã. Vui lòng thử lại sau khoảng ${mins} phút.`);
+      error.code = 'ip_rate_limited';
+      throw error;
     }
     if(data.error === 'daily_limit'){
-      throw new Error('Email này đã nhận quá nhiều mã trong hôm nay. Vui lòng thử lại vào ngày mai.');
+      const error = new Error('Email này đã nhận quá nhiều mã trong hôm nay. Vui lòng thử lại vào ngày mai.');
+      error.code = 'daily_limit';
+      throw error;
     }
-    throw new Error(OTP_REQUEST_ERROR_MESSAGES[data.error] || `Lỗi máy chủ (${res.status})`);
+    const error = new Error(OTP_REQUEST_ERROR_MESSAGES[data.error] || `Lỗi máy chủ (${res.status})`);
+    error.code = data.error || 'request_failed';
+    throw error;
   }
   return data; // { ok:true, expiresAt }
+}
+
+function otpRequestErrorMessage(error){
+  const message = error && error.message ? error.message : 'Không thể gửi mã xác minh.';
+  if(error && ['cooldown', 'ip_rate_limited', 'daily_limit'].includes(error.code)) return message;
+  return 'Gửi mã xác minh thất bại: ' + message + '. Thử lại nhé.';
 }
 
 async function verifyOtp(email, purpose, otp){
@@ -2524,7 +2599,7 @@ async function sendRegistrationOtp(email, password, name, legalConsent){
     setAuthMsg('register', '', '');
     lastOtpSentAt = Date.now();
   }catch(e){
-    setAuthMsg('register', 'Gửi mã xác minh thất bại: ' + e.message + '. Thử lại nhé.', 'error');
+    setAuthMsg('register', otpRequestErrorMessage(e), 'error');
     pendingRegistration = null;
   }
 }
@@ -2666,7 +2741,7 @@ async function sendForgotPasswordOtp(){
     document.getElementById('forgotOtpInput').focus();
     lastOtpSentAt = Date.now();
   }catch(e){
-    msgEl.textContent = 'Gửi mã xác minh thất bại: ' + e.message + '. Thử lại nhé.';
+    msgEl.textContent = otpRequestErrorMessage(e);
     msgEl.className = 'auth-msg error';
     pendingPasswordReset = null;
   }
@@ -3314,7 +3389,7 @@ buildProgress();
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyD2wMVDlB9qF6uBPkQadvGnPIxFmfq96tw",
   authDomain: "goi-y-phim.firebaseapp.com",
-  databaseURL: "https://goi-y-phim-default-rtdb.asia-southeast1.firebasedatabase.app",
+  databaseURL: "https://goi-y-phim-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "goi-y-phim",
   storageBucket: "goi-y-phim.firebasestorage.app",
   messagingSenderId: "484691972710",
