@@ -277,6 +277,17 @@ app.post('/api/otp/request', async (req, res) => {
       return res.status(500).json({ error: 'mail_not_configured' });
     }
 
+    // --- DEBUG TẠM THỜI: in ra (che bớt) giá trị SMTP thật server đang nhận được,
+    // để xác định có bị dính dấu cách/dấu ngoặc kép/sai giá trị khi copy vào Vercel không.
+    // XÓA đoạn debug này sau khi xác định xong nguyên nhân.
+    console.log('DEBUG SMTP_HOST =', JSON.stringify(process.env.SMTP_HOST));
+    console.log('DEBUG SMTP_PORT =', JSON.stringify(process.env.SMTP_PORT));
+    console.log('DEBUG SMTP_SECURE =', JSON.stringify(process.env.SMTP_SECURE));
+    console.log('DEBUG SMTP_USER =', JSON.stringify(process.env.SMTP_USER));
+    console.log('DEBUG SMTP_PASS length =', process.env.SMTP_PASS.length,
+      '| first char:', JSON.stringify(process.env.SMTP_PASS[0]),
+      '| last char:', JSON.stringify(process.env.SMTP_PASS[process.env.SMTP_PASS.length - 1]));
+
     // --- LỚP 1a: giới hạn theo IP (chặn spam nhiều email khác nhau từ 1 nguồn) ---
     const ip = clientIp(req);
     const ipCheck = checkWindowLimit(ipRequestLog, ip, IP_REQUEST_WINDOW_MS, IP_REQUEST_MAX);
