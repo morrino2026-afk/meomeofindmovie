@@ -346,7 +346,22 @@ app.post('/api/otp/request', async (req, res) => {
     console.error('Lỗi /api/otp/request:', err && err.message ? err.message : err);
     if (err && err.code) console.error('Mã lỗi SMTP:', err.code);
     if (err && err.response) console.error('Phản hồi từ SMTP server:', err.response);
-    res.status(500).json({ error: 'send_failed' });
+    // DEBUG TẠM THỜI: trả luôn chi tiết lỗi thật về cho trình duyệt (Network tab / body
+    // response) để xem trực tiếp không cần vào Vercel Dashboard. XÓA "debug" này sau khi
+    // xác định xong nguyên nhân — không nên để lộ chi tiết lỗi server cho người dùng cuối.
+    res.status(500).json({
+      error: 'send_failed',
+      debug: {
+        message: err && err.message,
+        code: err && err.code,
+        response: err && err.response,
+        smtpHost: process.env.SMTP_HOST || null,
+        smtpPort: process.env.SMTP_PORT || null,
+        smtpSecure: process.env.SMTP_SECURE || null,
+        smtpUser: process.env.SMTP_USER || null,
+        smtpPassLength: process.env.SMTP_PASS ? process.env.SMTP_PASS.length : null,
+      },
+    });
   }
 });
 
